@@ -18,12 +18,46 @@
     th, td { border: 1px solid #eaeaea; padding: 8px 12px; text-align: left; }
     th { background: #f3f6fa; }
     hr { border: none; border-top: 1px solid #eee; margin: 32px 0; }
+    .plugin-downloads { background: #f3f6fa; border-radius: 8px; box-shadow: 0 1px 6px rgba(44,90,255,0.04); padding: 28px 24px 18px 24px; margin-bottom: 32px; }
+    .plugin-list { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
+    .plugin-card { background: #fff; border-radius: 7px; box-shadow: 0 2px 8px rgba(44,90,255,0.07); padding: 18px 28px; display: flex; align-items: center; min-width: 260px; max-width: 320px; flex: 1 1 260px; }
+    .plugin-info { flex: 1; }
+    .plugin-title { font-weight: bold; color: #2a4d8f; font-size: 1.08em; display: block; margin-bottom: 4px; }
+    .plugin-desc { color: #666; font-size: 0.97em; }
+    .download-btn { background: linear-gradient(90deg,#4b8bf4,#2a4d8f); color: #fff; padding: 7px 22px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 1em; box-shadow: 0 1px 4px rgba(44,90,255,0.08); transition: background 0.2s; margin-left: 18px; }
+    .download-btn:hover { background: linear-gradient(90deg,#2a4d8f,#4b8bf4); }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="nav">
       <a href="/static/index.html">返回首页</a>
+    </div>
+    <div class="plugin-downloads">
+      <h2 style="color:#2a4d8f; margin-bottom:18px; text-align:center;">插件下载</h2>
+      <div class="plugin-list">
+        <div class="plugin-card">
+          <div class="plugin-info">
+            <span class="plugin-title">UMD 版</span>
+            <span class="plugin-desc">适用于浏览器直接引入，支持全局 Translator 对象。</span>
+          </div>
+          <a href="/static/js/translator.umd.js" download class="download-btn">下载</a>
+        </div>
+        <div class="plugin-card">
+          <div class="plugin-info">
+            <span class="plugin-title">UMD 压缩版</span>
+            <span class="plugin-desc">体积更小，适合生产环境，浏览器直接引入。</span>
+          </div>
+          <a href="/static/js/translator.umd.min.js" download class="download-btn">下载</a>
+        </div>
+        <div class="plugin-card">
+          <div class="plugin-info">
+            <span class="plugin-title">ESM 版</span>
+            <span class="plugin-desc">适用于现代前端工程化项目，支持 import。</span>
+          </div>
+          <a href="/static/js/translator.esm.js" download class="download-btn">下载</a>
+        </div>
+      </div>
     </div>
     <div id="plugin-doc"></div>
   </div>

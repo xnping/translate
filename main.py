@@ -13,7 +13,7 @@ import os
 from pydantic import BaseModel
 import shutil
 
-app = FastAPI(title="Baidu Translation API Proxy")
+app = FastAPI(title="TranslationAPI")
 
 # 添加CORS支持
 app.add_middleware(
@@ -157,7 +157,7 @@ for name, code in aSEAN_langs.items():
 
 # 启动服务器命令: uvicorn main:app --reload
 if __name__ == "__main__":
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # CORS(app, resources={r"/api/*": {"origins": "*"}})
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
