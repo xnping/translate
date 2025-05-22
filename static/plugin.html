@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Translator.js插件文档</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+  <style>
+    body { background: #f7f9fa; font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif; margin: 0; }
+    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 32px 32px 48px 32px; }
+    h1 { text-align: center; color: #2a4d8f; margin-bottom: 16px; }
+    .nav { text-align: right; margin-bottom: 24px; }
+    .nav a { color: #4b8bf4; text-decoration: none; margin-left: 18px; font-weight: bold; }
+    .nav a:hover { text-decoration: underline; }
+    pre { background: #f6f8fa; border-radius: 6px; padding: 12px; overflow-x: auto; }
+    code { font-size: 1em; }
+    table { border-collapse: collapse; width: 100%; margin: 18px 0; }
+    th, td { border: 1px solid #eaeaea; padding: 8px 12px; text-align: left; }
+    th { background: #f3f6fa; }
+    hr { border: none; border-top: 1px solid #eee; margin: 32px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <a href="/static/index.html">返回首页</a>
+    </div>
+    <div id="plugin-doc"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>
+    fetch('/static/js/baidu-translator.md')
+      .then(res => res.text())
+      .then(md => {
+        document.getElementById('plugin-doc').innerHTML = marked.parse(md);
+        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+      });
+  </script>
+</body>
+</html> 
