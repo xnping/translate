@@ -4,9 +4,18 @@ on:
   push:
     branches: [ main ]
 
+# 添加这个权限块
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v3
 
@@ -20,4 +29,4 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 
+        uses: actions/deploy-pages@v4
