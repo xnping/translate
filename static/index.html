@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日新闻</title>
+    <style>
+        body {
+            background: #f7f9fa;
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 32px;
+        }
+        .news-item {
+            margin-bottom: 36px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 24px;
+        }
+        .news-title {
+            font-size: 1.4em;
+            color: #2a4d8f;
+            margin-bottom: 10px;
+        }
+        .news-meta {
+            color: #888;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+        .news-content {
+            color: #444;
+            line-height: 1.8;
+        }
+        /* 右上角翻译控件样式 */
+        .translate-bar {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .translate-select {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+        .translate-btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            border: none;
+            background: #4b8bf4;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .translate-btn:hover {
+            background: #356ad8;
+        }
+        .translate-status {
+            margin-left: 10px;
+            color: #888;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 右上角翻译控件 -->
+        <div class="translate-bar">
+            <select id="langSelect" class="translate-select">
+                <option value="zh">中文</option>
+                <option value="en">英语</option>
+                <option value="id">印尼语</option>
+                <option value="ms">马来语</option>
+                <option value="fil">菲律宾语</option>
+                <option value="my">缅甸语</option>
+                <option value="km">高棉语</option>
+                <option value="lo">老挝语</option>
+                <option value="th">泰语</option>
+                <option value="vie">越南语</option>
+                <option value="ta">泰米尔语</option>
+            </select>
+            <button id="translateBtn" class="translate-btn">翻译</button>
+            <span id="translateStatus" class="translate-status"></span>
+        </div>
+        <h1>今日新闻</h1>
+        <div class="news-item">
+            <div class="news-title">中国成功发射新一代载人飞船试验船</div>
+            <div class="news-meta">2024-06-01  来源：新华社</div>
+            <div class="news-content">
+                北京时间6月1日9时，中国在酒泉卫星发射中心成功发射新一代载人飞船试验船。此次发射标志着中国载人航天工程取得又一重大突破，为未来深空探测任务奠定了坚实基础。
+            </div>
+        </div>
+        <div class="news-item">
+            <div class="news-title">全球气候峰会聚焦绿色能源转型</div>
+            <div class="news-meta">2024-06-01  来源：央视新闻</div>
+            <div class="news-content">
+                第29届全球气候峰会在巴黎召开，来自100多个国家的代表共同探讨绿色能源转型与碳中和路径。会议呼吁各国加大可再生能源投资，推动全球气候治理合作。
+            </div>
+        </div>
+        <div class="news-item">
+            <div class="news-title">人工智能助力医疗诊断新突破</div>
+            <div class="news-meta">2024-06-01  来源：科技日报</div>
+            <div class="news-content">
+                近日，国内多家医院联合发布AI辅助诊断系统，能够高效识别多种疾病影像。专家表示，人工智能将极大提升医疗服务效率，改善患者就医体验。
+            </div>
+        </div>
+        <div class="news-item">
+            <div class="news-title">中国女排夺得世界联赛冠军</div>
+            <div class="news-meta">2024-06-01  来源：新浪体育</div>
+            <div class="news-content">
+                在刚刚结束的世界女排联赛决赛中，中国女排以3:1战胜强敌意大利队，成功夺冠。这是中国女排时隔三年再次登顶世界联赛。
+            </div>
+        </div>
+    </div>
+    <script src="js/baidu-translator.js"></script>
+    <script>
+        // 右上角翻译功能
+        const langSelect = document.getElementById('langSelect');
+        const translateBtn = document.getElementById('translateBtn');
+        const translateStatus = document.getElementById('translateStatus');
+        const newsContents = document.querySelectorAll('.news-content');
+        const newsTitles = document.querySelectorAll('.news-title');
+        // 保存原文，便于切换回中文
+        const originalTexts = Array.from(newsContents).map(el => el.innerText);
+        const originalTitles = Array.from(newsTitles).map(el => el.innerText);
+        // 实例化翻译器
+        const translator = new BaiduTranslator('/api');
+
+        translateBtn.addEventListener('click', async () => {
+            const lang = langSelect.value;
+            if (lang === 'zh') {
+                // 切回中文
+                newsContents.forEach((el, i) => el.innerText = originalTexts[i]);
+                newsTitles.forEach((el, i) => el.innerText = originalTitles[i]);
+                translateStatus.textContent = '已切换为中文';
+                setTimeout(() => translateStatus.textContent = '', 1500);
+                return;
+            }
+            translateBtn.disabled = true;
+            translateStatus.textContent = '翻译中...';
+            try {
+                // 批量翻译内容
+                const contentResults = await translator.batchTranslate(originalTexts, 'zh', lang);
+                const titleResults = await translator.batchTranslate(originalTitles, 'zh', lang);
+                newsContents.forEach((el, i) => el.innerText = contentResults[i].translatedText);
+                newsTitles.forEach((el, i) => el.innerText = titleResults[i].translatedText);
+                translateStatus.textContent = '翻译完成';
+                setTimeout(() => translateStatus.textContent = '', 1500);
+            } catch (e) {
+                translateStatus.textContent = '翻译失败: ' + e.message;
+            } finally {
+                translateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html> 
