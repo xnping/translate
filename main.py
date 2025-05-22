@@ -11,6 +11,7 @@ import json
 import time
 import os
 from pydantic import BaseModel
+import shutil
 
 app = FastAPI(title="Baidu Translation API Proxy")
 
@@ -159,4 +160,7 @@ if __name__ == "__main__":
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+if os.path.exists('api.md') and not os.path.exists('static/api.md'):
+    shutil.move('api.md', 'static/api.md')
 

@@ -1,6 +1,6 @@
-# BaiduTranslator.js 插件 API 文档
+# Translator.js 插件 API 文档
 
-BaiduTranslator 是一个适用于东盟多语言场景的百度翻译 API 前端插件，支持通用翻译、东盟十国快捷翻译、DOM自动渲染、字体大小控制、批量翻译、语言检测等。
+Translator 是一个适用于东盟多语言场景的百度翻译 API 前端插件，支持通用翻译、东盟十国快捷翻译、DOM自动渲染、字体大小控制、批量翻译、语言检测等。
 
 ---
 
