@@ -31,7 +31,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script>
-    fetch('/static/api.md')
+    fetch('/translate/static/api.md')
       .then(res => res.text())
       .then(md => {
         document.getElementById('api-doc').innerHTML = marked.parse(md);
