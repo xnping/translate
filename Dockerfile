@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 复制项目代码
 COPY . .
 
+# 复制示例环境配置文件（如果不存在.env）
+RUN if [ ! -f .env ]; then cp env.example .env || echo "No env.example found"; fi
+
 # 暴露端口
 EXPOSE 8000
 
