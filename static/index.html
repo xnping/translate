@@ -6,39 +6,874 @@
   <title>翻译API官网</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
   <style>
-    body { background: #f7f9fa; font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif; margin: 0; }
-    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 32px 32px 48px 32px; }
-    h1 { text-align: center; color: #2a4d8f; margin-bottom: 16px; }
-    .nav { text-align: right; margin-bottom: 24px; }
-    .nav a { color: #4b8bf4; text-decoration: none; margin-left: 18px; font-weight: bold; }
-    .nav a:hover { text-decoration: underline; }
-    pre { background: #f6f8fa; border-radius: 6px; padding: 12px; overflow-x: auto; }
-    code { font-size: 1em; }
-    table { border-collapse: collapse; width: 100%; margin: 18px 0; }
-    th, td { border: 1px solid #eaeaea; padding: 8px 12px; text-align: left; }
-    th { background: #f3f6fa; }
-    hr { border: none; border-top: 1px solid #eee; margin: 32px 0; }
+    body { 
+      background: #f7f9fa; 
+      font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif; 
+      margin: 0; 
+      color: #333;
+      line-height: 1.6;
+    }
+    .container { 
+      max-width: 1000px; 
+      margin: 0 auto; 
+      background: #fff; 
+      border-radius: 10px; 
+      box-shadow: 0 2px 15px rgba(0,0,0,0.08); 
+      padding: 30px 40px;
+      margin-top: 30px;
+      margin-bottom: 50px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2a4d8f;
+    }
+    h1 { 
+      color: #2a4d8f; 
+      margin-top: 40px;
+      margin-bottom: 20px; 
+      font-size: 32px;
+    }
+    h2 {
+      color: #2a4d8f;
+      margin-top: 30px;
+      font-size: 24px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .nav { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    .nav a { 
+      color: #4b8bf4; 
+      text-decoration: none; 
+      margin-left: 18px; 
+      font-weight: bold; 
+      transition: color 0.2s;
+    }
+    .nav a:hover { 
+      color: #1a73e8;
+      text-decoration: underline; 
+    }
+    pre { 
+      background: #f6f8fa; 
+      border-radius: 6px; 
+      padding: 16px; 
+      overflow-x: auto; 
+      border: 1px solid #e8e8e8;
+    }
+    code { 
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 14px;
+    }
+    table { 
+      border-collapse: collapse; 
+      width: 100%; 
+      margin: 24px 0; 
+      font-size: 15px;
+    }
+    th, td { 
+      border: 1px solid #eaeaea; 
+      padding: 10px 15px; 
+      text-align: left; 
+    }
+    th { 
+      background: #f3f6fa; 
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    hr { 
+      border: none; 
+      border-top: 1px solid #eee; 
+      margin: 32px 0; 
+    }
+    .language-switcher { 
+      display: flex; 
+      align-items: center; 
+    }
+    .language-btn { 
+      background: #f0f4f9; 
+      border: 1px solid #d0d7de; 
+      border-radius: 4px; 
+      padding: 8px 14px; 
+      margin-left: 8px; 
+      cursor: pointer; 
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .language-btn:hover { 
+      background: #e0e7ef; 
+    }
+    .language-btn.active { 
+      background: #4b8bf4; 
+      color: white; 
+      border-color: #4b8bf4; 
+    }
+    .api-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #fdfdfd;
+      border: 1px solid #eee;
+    }
+    .endpoint {
+      display: inline-block;
+      background: #e8f0fe;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: bold;
+      margin: 8px 0;
+      border: 1px solid #d0e0fc;
+    }
+    footer {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .hidden-en {
+      display: none;
+    }
+    .visible-en {
+      display: none;
+    }
+    .language-json {
+      background: #f6f8fa;
+      border-radius: 6px;
+    }
+    .language-bash {
+      background: #f6f8fa;
+      border-radius: 6px;
+    }
+    .language-js {
+      background: #f6f8fa;
+      border-radius: 6px;
+    }
+    /* 悬浮语言切换器样式 */
+    .floating-language-switcher {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1000;
+    }
+    .language-toggle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #4b8bf4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s;
+    }
+    .language-toggle:hover {
+      transform: scale(1.05);
+    }
+    .language-options {
+      position: absolute;
+      bottom: 60px;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+      display: none;
+    }
+    .language-options.active {
+      display: block;
+    }
+    .language-option {
+      padding: 8px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: none;
+      font-size: 15px;
+    }
+    .language-option:hover {
+      background: #f0f4f9;
+    }
+    .language-option.active {
+      background: #e0e7ef;
+      font-weight: bold;
+      color: #4b8bf4;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="nav">
-      <a href="/translate/static/plugin.html">插件页</a>
+    <header>
+      <div class="logo" data-translate="site-title">翻译API官网</div>
+      <div class="nav">
+        <div class="nav-links">
+          <a href="/static/plugin.html" data-translate="plugin-page">插件页</a>
+        </div>
+      </div>
+    </header>
+
+    <div id="api-doc">
+      <!-- 中文API文档内容 -->
+      <div class="api-content zh">
+        <div class="api-section">
+          <h1>API 文档</h1>
+        
+          <h2>1. 获取支持语言列表</h2>
+          <ul>
+            <li><strong>接口</strong>：<code>GET</code> <span class="endpoint">/api/languages</span></li>
+            <li><strong>说明</strong>：返回东盟十国官方语言代码及名称。</li>
+            <li><strong>请求参数</strong>：无</li>
+            <li><strong>返回示例</strong>：</li>
+          </ul>
+        
+          <pre><code class="language-json">{
+  "auto": "自动检测",
+  "id": "印尼语",
+  "ms": "马来语",
+  "fil": "菲律宾语",
+  "my": "缅甸语",
+  "km": "高棉语",
+  "lo": "老挝语",
+  "th": "泰语",
+  "vie": "越南语",
+  "en": "英语",
+  "zh": "中文",
+  "ta": "泰米尔语"
+}</code></pre>
+        </div>
+        
+        <div class="api-section">
+          <h2>2. 通用翻译接口（异步）</h2>
+          <ul>
+            <li><strong>接口</strong>：<code>POST</code> <span class="endpoint">/api/translate</span></li>
+            <li><strong>说明</strong>：通用文本翻译，支持自定义源语言和目标语言，采用异步处理。</li>
+            <li><strong>请求参数</strong>（JSON）：
+              <ul>
+                <li><code>text</code> (string, 必填)：要翻译的文本</li>
+                <li><code>from_lang</code> (string, 可选，默认<code>auto</code>)：源语言代码</li>
+                <li><code>to_lang</code> (string, 可选，默认<code>zh</code>)：目标语言代码</li>
+                <li><code>font_size</code> (string, 可选)：翻译后建议的字体大小（如 <code>"24px"</code>），会原样返回</li>
+              </ul>
+            </li>
+            <li><strong>返回示例</strong>：</li>
+          </ul>
+        
+          <pre><code class="language-json">{
+  "from": "zh",
+  "to": "en",
+  "trans_result": [
+    { "src": "你好", "dst": "Hello" }
+  ],
+  "font_size": "28px"
+}</code></pre>
+        
+          <ul>
+            <li><strong>使用示例</strong>：
+              <ul>
+                <li>curl：
+                  <pre><code class="language-bash">curl -X POST http://localhost:8000/api/translate \
+  -H "Content-Type: application/json" \
+  -d '{"text": "你好世界", "from_lang": "zh", "to_lang": "en", "font_size": "28px"}'</code></pre>
+                </li>
+                <li>JS：
+                  <pre><code class="language-js">fetch('/api/translate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ text: '你好世界', from_lang: 'zh', to_lang: 'en', font_size: '28px' })
+}).then(r => r.json()).then(console.log);</code></pre>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="api-section">
+          <h2>3. 批量翻译接口（异步）</h2>
+          <ul>
+            <li><strong>接口</strong>：<code>POST</code> <span class="endpoint">/api/batch/translate</span></li>
+            <li><strong>接口说明</strong>：支持一次请求翻译多个文本，使用并行请求处理，提高处理速度</li>
+            <li><strong>请求参数</strong>（JSON）：
+              <ul>
+                <li><code>items</code> (array, 必填)：要翻译的文本数组，每项包含：
+                  <ul>
+                    <li><code>text</code> (string, 必填)：要翻译的文本内容</li>
+                    <li><code>id</code> (string, 可选)：客户端定义的ID，用于匹配结果</li>
+                  </ul>
+                </li>
+                <li><code>from_lang</code> (string, 可选，默认<code>auto</code>)：源语言代码</li>
+                <li><code>to_lang</code> (string, 可选，默认<code>zh</code>)：目标语言代码</li>
+                <li><code>font_size</code> (string, 可选)：翻译后建议的字体大小</li>
+              </ul>
+            </li>
+            <li><strong>返回示例</strong>：</li>
+          </ul>
+        
+          <pre><code class="language-json">{
+  "results": [
+    {
+      "from": "zh",
+      "to": "en",
+      "trans_result": [
+        { "src": "你好", "dst": "Hello" }
+      ],
+      "id": "greeting",
+      "index": 0
+    },
+    {
+      "from": "zh", 
+      "to": "en",
+      "trans_result": [
+        { "src": "世界", "dst": "World" }
+      ],
+      "id": "world",
+      "index": 1
+    }
+  ],
+  "total": 2,
+  "success": 2,
+  "failed": 0
+}</code></pre>
+        
+          <ul>
+            <li><strong>使用示例</strong>：
+              <ul>
+                <li>curl：
+                  <pre><code class="language-bash">curl -X POST http://localhost:8000/api/batch/translate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {"text": "你好", "id": "greeting"}, 
+      {"text": "世界", "id": "world"}
+    ], 
+    "from_lang": "zh", 
+    "to_lang": "en", 
+    "font_size": "28px"
+  }'</code></pre>
+                </li>
+                <li>JS：
+                  <pre><code class="language-js">fetch('/api/batch/translate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    items: [
+      {text: '你好', id: 'greeting'}, 
+      {text: '世界', id: 'world'}
+    ],
+    from_lang: 'zh',
+    to_lang: 'en',
+    font_size: '28px'
+  })
+}).then(r => r.json()).then(console.log);</code></pre>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="api-section">
+          <h2>4. 单一目标语言翻译接口（异步）</h2>
+          <ul>
+            <li><strong>接口</strong>：<code>POST</code> <span class="endpoint">/api/translate_to_xxx</span>
+              <ul>
+                <li>其中 <code>xxx</code> 为目标语言英文名（见下表）</li>
+              </ul>
+            </li>
+            <li><strong>说明</strong>：将中文翻译为指定目标语言，使用异步处理</li>
+            <li><strong>请求参数</strong>（JSON）：
+              <ul>
+                <li><code>text</code> (string, 必填)：要翻译的中文文本</li>
+                <li><code>font_size</code> (string, 可选)：翻译后建议的字体大小（如 <code>"24px"</code>），会原样返回</li>
+              </ul>
+            </li>
+            <li><strong>返回示例</strong>：同通用翻译接口</li>
+            <li><strong>支持的接口列表</strong>：</li>
+          </ul>
+        
+          <table>
+            <thead>
+              <tr>
+                <th>目标语言</th>
+                <th>接口路径</th>
+                <th>语言代码</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>印尼语</td>
+                <td>/api/translate_to_indonesian</td>
+                <td>id</td>
+              </tr>
+              <tr>
+                <td>马来语</td>
+                <td>/api/translate_to_malay</td>
+                <td>ms</td>
+              </tr>
+              <tr>
+                <td>菲律宾语</td>
+                <td>/api/translate_to_filipino</td>
+                <td>fil</td>
+              </tr>
+              <tr>
+                <td>缅甸语</td>
+                <td>/api/translate_to_burmese</td>
+                <td>my</td>
+              </tr>
+              <tr>
+                <td>高棉语</td>
+                <td>/api/translate_to_khmer</td>
+                <td>km</td>
+              </tr>
+              <tr>
+                <td>老挝语</td>
+                <td>/api/translate_to_lao</td>
+                <td>lo</td>
+              </tr>
+              <tr>
+                <td>泰语</td>
+                <td>/api/translate_to_thai</td>
+                <td>th</td>
+              </tr>
+              <tr>
+                <td>越南语</td>
+                <td>/api/translate_to_vietnamese</td>
+                <td>vie</td>
+              </tr>
+              <tr>
+                <td>英语</td>
+                <td>/api/translate_to_english</td>
+                <td>en</td>
+              </tr>
+              <tr>
+                <td>泰米尔语</td>
+                <td>/api/translate_to_tamil</td>
+                <td>ta</td>
+              </tr>
+            </tbody>
+          </table>
+        
+          <ul>
+            <li><strong>使用示例</strong>：
+              <ul>
+                <li>curl：
+                  <pre><code class="language-bash">curl -X POST http://localhost:8000/api/translate_to_thai \
+  -H "Content-Type: application/json" \
+  -d '{"text": "你好世界", "font_size": "32px"}'</code></pre>
+                </li>
+                <li>JS：
+                  <pre><code class="language-js">fetch('/api/translate_to_thai', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ text: '你好世界', font_size: '32px' })
+}).then(r => r.json()).then(console.log);</code></pre>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="api-section">
+          <h2>5. 单一目标语言批量翻译接口（异步）</h2>
+          <ul>
+            <li><strong>接口</strong>：<code>POST</code> <span class="endpoint">/api/batch/translate_to_xxx</span>
+              <ul>
+                <li>其中 <code>xxx</code> 为目标语言英文名（同上表）</li>
+              </ul>
+            </li>
+            <li><strong>说明</strong>：批量将中文翻译为指定目标语言，使用异步并行处理</li>
+            <li><strong>请求参数</strong>（JSON）：
+              <ul>
+                <li><code>items</code> (array, 必填)：要翻译的文本数组，每项可以是：
+                  <ul>
+                    <li>字符串：直接作为要翻译的文本</li>
+                    <li>对象：包含 <code>text</code> 和可选的 <code>id</code> 字段</li>
+                  </ul>
+                </li>
+                <li><code>font_size</code> (string, 可选)：翻译后建议的字体大小</li>
+              </ul>
+            </li>
+            <li><strong>返回示例</strong>：同批量翻译接口</li>
+            <li><strong>使用示例</strong>：
+              <ul>
+                <li>curl：
+                  <pre><code class="language-bash">curl -X POST http://localhost:8000/api/batch/translate_to_thai \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {"text": "你好", "id": "greeting"}, 
+      {"text": "世界", "id": "world"},
+      "中国"
+    ], 
+    "font_size": "32px"
+  }'</code></pre>
+                </li>
+                <li>JS：
+                  <pre><code class="language-js">fetch('/api/batch/translate_to_thai', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    items: [
+      {text: '你好', id: 'greeting'}, 
+      {text: '世界', id: 'world'},
+      '中国'
+    ],
+    font_size: '32px'
+  })
+}).then(r => r.json()).then(console.log);</code></pre>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="api-section">
+          <h2>6. 错误返回格式</h2>
+          <ul>
+            <li><strong>单条翻译错误示例</strong>：</li>
+          </ul>
+        
+          <pre><code class="language-json">{
+  "error": "文本不能为空"
+}</code></pre>
+        
+          <ul>
+            <li><strong>批量翻译错误示例</strong>：</li>
+          </ul>
+        
+          <pre><code class="language-json">{
+  "results": [
+    {
+      "from": "zh",
+      "to": "en",
+      "trans_result": [
+        { "src": "你好", "dst": "Hello" }
+      ],
+      "id": "greeting",
+      "index": 0
+    }
+  ],
+  "total": 2,
+  "success": 1,
+  "failed": 1,
+  "errors": [
+    {
+      "index": 1,
+      "id": "empty",
+      "error": "文本不能为空"
+    }
+  ]
+}</code></pre>
+        </div>
+        
+        <div class="api-section">
+          <h2>7. 健康检查接口</h2>
+          <ul>
+            <li><strong>接口</strong>：<code>GET</code> <span class="endpoint">/health</span></li>
+            <li><strong>说明</strong>：检查服务状态，包括Redis缓存连接状态</li>
+            <li><strong>返回示例</strong>：</li>
+          </ul>
+        
+          <pre><code class="language-json">{
+  "status": "ok",
+  "timestamp": 1623456789.123,
+  "cache": "connected"
+}</code></pre>
+        </div>
+        
+        <div class="api-section">
+          <h2>8. 前端插件调用示例</h2>
+        
+          <pre><code class="language-js">const translator = new BaiduTranslator('/api');
+
+// 通用翻译
+translator.translate('你好', 'zh', 'en', true, { fontSize: '30px' }).then(res => {
+  document.getElementById('myDiv').innerText = res.translatedText;
+  if (res.font_size) document.getElementById('myDiv').style.fontSize = res.font_size;
+});
+
+// 特定语言翻译
+translator.translateToThai('你好', { fontSize: '24px' }).then(res => {
+  document.getElementById('myDiv').innerText = res.translatedText;
+  if (res.font_size) document.getElementById('myDiv').style.fontSize = res.font_size;
+});
+
+// 批量翻译
+translator.batchTranslate(
+  [{text: '你好', id: 'greeting'}, {text: '世界', id: 'world'}],
+  'zh', 'en'
+).then(res => {
+  // 处理结果
+  res.results.forEach(item => {
+    document.getElementById(item.id).innerText = item.trans_result[0].dst;
+  });
+});</code></pre>
+        </div>
+      </div>
+      
+      <!-- 英文API文档内容 - 初始隐藏 -->
+      <div class="api-content en hidden-en" id="api-doc-english"></div>
     </div>
-    <!-- <h1>翻译API官网</h1> -->
-    <div id="api-doc"></div>
+
+    <footer>
+      <p data-translate="footer-text">© 2025 翻译API服务 | 提供东盟十国语言翻译服务</p>
+    </footer>
   </div>
 
+  <!-- 悬浮语言切换器 -->
+  <div class="floating-language-switcher">
+    <div class="language-toggle" id="language-toggle">
+      <span id="current-language">中</span>
+    </div>
+    <div class="language-options" id="language-options">
+      <button class="language-option active" data-lang="zh">中文</button>
+      <button class="language-option" data-lang="en">English</button>
+    </div>
+  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="/static/js/translator.js"></script>
   <script>
-    fetch('/translate/static/api.md')
-      .then(res => res.text())
-      .then(md => {
-        document.getElementById('api-doc').innerHTML = marked.parse(md);
-        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+    // 初始化翻译器
+    const translator = new BaiduTranslator('/api');
+
+    // 定义页面UI元素文本
+    const translations = {
+      zh: {
+        "site-title": "翻译API官网",
+        "plugin-page": "插件页",
+        "language-label": "语言：",
+        "github-link": "GitHub",
+        "footer-text": "© 2023 翻译API服务 | 提供东盟十国语言翻译服务",
+        "current-language": "中"
+      },
+      en: {
+        "site-title": "Translation API Website",
+        "plugin-page": "Plugin Page",
+        "language-label": "Language:",
+        "github-link": "GitHub",
+        "footer-text": "© 2023 Translation API Service | Providing translation services for ASEAN languages",
+        "current-language": "EN"
+      }
+    };
+
+    // 当前语言
+    let currentLang = 'zh';
+    let isTranslated = false;
+    
+    // 语法高亮
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
       });
+    });
+
+    // 翻译页面UI元素
+    function translateUI(targetLang) {
+      const elements = document.querySelectorAll('[data-translate]');
+      elements.forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (translations[targetLang] && translations[targetLang][key]) {
+          el.textContent = translations[targetLang][key];
+        }
+      });
+      
+      // 更新悬浮窗显示的当前语言
+      document.getElementById('current-language').textContent = translations[targetLang]['current-language'];
+    }
+    
+    // 增强Markdown渲染
+    function enhanceRenderedContent(html) {
+      // 增强渲染的HTML内容，添加额外样式和交互
+      let enhanced = html;
+      
+      // 为接口路径添加样式
+      enhanced = enhanced.replace(/<code>GET\s+([^<]+)<\/code>/g, '<code>GET</code> <span class="endpoint">$1</span>');
+      enhanced = enhanced.replace(/<code>POST\s+([^<]+)<\/code>/g, '<code>POST</code> <span class="endpoint">$1</span>');
+      
+      // 为各个API部分添加包装
+      enhanced = enhanced.replace(/<h2>(.*?)<\/h2>/g, '</div><div class="api-section"><h2>$1</h2>');
+      
+      // 闭合第一个和最后一个div
+      enhanced = enhanced.replace('</div>', '', 1);
+      enhanced = enhanced + '</div>';
+      
+      return enhanced;
+    }
+    
+    // 翻译API文档内容
+    async function translateApiDoc(targetLang) {
+      if (targetLang === 'zh') {
+        // 显示中文内容，隐藏英文内容
+        document.querySelector('.api-content.zh').style.display = 'block';
+        document.querySelector('.api-content.en').style.display = 'none';
+        return;
+      }
+      
+      try {
+        // 如果已经翻译过，直接切换显示
+        if (isTranslated) {
+          document.querySelector('.api-content.zh').style.display = 'none';
+          document.querySelector('.api-content.en').style.display = 'block';
+          return;
+        }
+        
+        // 获取所有需要翻译的元素
+        const elementsToTranslate = document.querySelectorAll('.api-content.zh h1, .api-content.zh h2, .api-content.zh p, .api-content.zh li, .api-content.zh th, .api-content.zh td');
+        
+        // 克隆中文内容作为英文内容的基础
+        const englishContent = document.querySelector('.api-content.zh').cloneNode(true);
+        englishContent.classList.remove('zh');
+        englishContent.classList.add('en');
+        
+        // 将所有需要翻译的文本收集起来
+        const textsToTranslate = [];
+        elementsToTranslate.forEach((el, index) => {
+          // 跳过代码块内容和空元素
+          if (!el.closest('pre') && el.textContent.trim()) {
+            textsToTranslate.push({
+              text: el.textContent,
+              id: `text_${index}`
+            });
+          }
+        });
+        
+        // 批量翻译收集到的文本
+        if (textsToTranslate.length > 0) {
+          const response = await fetch(`${translator.baseUrl}/batch/translate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              items: textsToTranslate,
+              from_lang: 'zh',
+              to_lang: 'en'
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`翻译API返回错误: ${response.status}`);
+          }
+          
+          const result = await response.json();
+          
+          if (result && result.results) {
+            // 替换英文内容的对应文本
+            let index = 0;
+            const englishElements = englishContent.querySelectorAll('h1, h2, p, li, th, td');
+            
+            englishElements.forEach(el => {
+              // 跳过代码块内容和空元素
+              if (!el.closest('pre') && el.textContent.trim()) {
+                const translatedItem = result.results.find(item => item.id === `text_${index}`);
+                if (translatedItem && translatedItem.trans_result && translatedItem.trans_result.length > 0) {
+                  el.textContent = translatedItem.trans_result[0].dst;
+                }
+                index++;
+              }
+            });
+            
+            // 标记已翻译
+            isTranslated = true;
+          }
+          
+          // 替换英文文档内容并显示
+          const container = document.getElementById('api-doc-english');
+          container.innerHTML = '';
+          container.appendChild(englishContent);
+          
+          // 应用代码高亮
+          container.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+          });
+          
+          document.querySelector('.api-content.zh').style.display = 'none';
+          document.querySelector('.api-content.en').style.display = 'block';
+          container.classList.remove('hidden-en');
+        }
+        
+      } catch (error) {
+        console.error('翻译文档出错:', error);
+      }
+    }
+
+    // 悬浮窗语言切换逻辑
+    document.getElementById('language-toggle').addEventListener('click', function() {
+      document.getElementById('language-options').classList.toggle('active');
+    });
+
+    // 点击页面其他地方关闭语言选项
+    document.addEventListener('click', function(event) {
+      if (!event.target.closest('.floating-language-switcher')) {
+        document.getElementById('language-options').classList.remove('active');
+      }
+    });
+
+    // 语言切换事件
+    document.querySelectorAll('.language-option').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const targetLang = this.getAttribute('data-lang');
+        if (targetLang === currentLang) return;
+        
+        // 更新按钮样式
+        document.querySelectorAll('.language-option').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 更新当前语言
+        currentLang = targetLang;
+        
+        // 保存语言偏好到localStorage
+        localStorage.setItem('preferredLanguage', targetLang);
+        
+        // 翻译UI元素
+        translateUI(targetLang);
+        
+        // 翻译API文档内容
+        await translateApiDoc(targetLang);
+        
+        // 关闭语言选项面板
+        document.getElementById('language-options').classList.remove('active');
+      });
+    });
+
+    // 检查是否有保存的语言偏好
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedLanguage = localStorage.getItem('preferredLanguage');
+      if (savedLanguage && savedLanguage !== currentLang) {
+        // 触发语言切换
+        const langBtn = document.querySelector(`.language-option[data-lang="${savedLanguage}"]`);
+        if (langBtn) {
+          langBtn.click();
+        }
+      }
+      
+      // 应用代码高亮
+      document.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
+      });
+    });
   </script>
 </body>
 </html> 

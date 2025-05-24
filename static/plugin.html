@@ -6,17 +6,21 @@
   <title>Translator.js插件文档</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
   <style>
-    body { background: #f7f9fa; font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif; margin: 0; }
+    body { background: #f7f9fa; font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif; margin: 0; color: #333; line-height: 1.6; }
     .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 32px 32px 48px 32px; }
-    h1 { text-align: center; color: #2a4d8f; margin-bottom: 16px; }
+    h1 { text-align: center; color: #2a4d8f; margin-bottom: 20px; font-size: 32px; }
+    h2 { color: #2a4d8f; margin-top: 30px; margin-bottom: 16px; font-size: 24px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+    h3 { color: #2a4d8f; margin-top: 25px; margin-bottom: 15px; font-size: 20px; }
     .nav { text-align: right; margin-bottom: 24px; }
-    .nav a { color: #4b8bf4; text-decoration: none; margin-left: 18px; font-weight: bold; }
-    .nav a:hover { text-decoration: underline; }
-    pre { background: #f6f8fa; border-radius: 6px; padding: 12px; overflow-x: auto; }
-    code { font-size: 1em; }
-    table { border-collapse: collapse; width: 100%; margin: 18px 0; }
-    th, td { border: 1px solid #eaeaea; padding: 8px 12px; text-align: left; }
-    th { background: #f3f6fa; }
+    .nav a { color: #4b8bf4; text-decoration: none; margin-left: 18px; font-weight: bold; transition: color 0.2s; }
+    .nav a:hover { text-decoration: underline; color: #1a73e8; }
+    pre { background: #f6f8fa; border-radius: 6px; padding: 15px; overflow-x: auto; border: 1px solid #e8e8e8; margin: 18px 0; }
+    code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 14px; }
+    p code, li code { background: #f0f2f5; padding: 2px 5px; border-radius: 3px; color: #d14; font-size: 0.95em; }
+    table { border-collapse: collapse; width: 100%; margin: 22px 0; }
+    th, td { border: 1px solid #eaeaea; padding: 10px 15px; text-align: left; }
+    th { background: #f3f6fa; font-weight: 600; }
+    tr:nth-child(even) { background-color: #f8f9fa; }
     hr { border: none; border-top: 1px solid #eee; margin: 32px 0; }
     .plugin-downloads { background: #f3f6fa; border-radius: 8px; box-shadow: 0 1px 6px rgba(44,90,255,0.04); padding: 28px 24px 18px 24px; margin-bottom: 32px; }
     .plugin-list { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
@@ -26,51 +30,622 @@
     .plugin-desc { color: #666; font-size: 0.97em; }
     .download-btn { background: linear-gradient(90deg,#4b8bf4,#2a4d8f); color: #fff; padding: 7px 22px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 1em; box-shadow: 0 1px 4px rgba(44,90,255,0.08); transition: background 0.2s; margin-left: 18px; }
     .download-btn:hover { background: linear-gradient(90deg,#2a4d8f,#4b8bf4); }
+    .hidden-en {
+      display: none;
+    }
+    .language-js {
+      background: #f6f8fa;
+      border-radius: 6px;
+    }
+    .language-json {
+      background: #f6f8fa;
+      border-radius: 6px;
+    }
+    /* 悬浮语言切换器样式 */
+    .floating-language-switcher {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1000;
+    }
+    .language-toggle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #4b8bf4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s;
+    }
+    .language-toggle:hover {
+      transform: scale(1.05);
+    }
+    .language-options {
+      position: absolute;
+      bottom: 60px;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+      display: none;
+    }
+    .language-options.active {
+      display: block;
+    }
+    .language-option {
+      padding: 8px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: none;
+      font-size: 15px;
+    }
+    .language-option:hover {
+      background: #f0f4f9;
+    }
+    .language-option.active {
+      background: #e0e7ef;
+      font-weight: bold;
+      color: #4b8bf4;
+    }
+    .endpoint {
+      display: inline-block;
+      background: #e8f0fe;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: bold;
+      margin: 8px 0;
+      border: 1px solid #d0e0fc;
+    }
+    footer {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .visible-en {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="nav">
-      
-      <a href="/translate/static/index.html">返回首页</a>
+      <a href="/static/index.html" data-translate="back-home">返回首页</a>
     </div>
+    
     <div class="plugin-downloads">
-      <h2 style="color:#2a4d8f; margin-bottom:18px; text-align:center;">插件下载</h2>
+      <h2 style="color:#2a4d8f; margin-bottom:18px; text-align:center;" data-translate="plugin-download">插件下载</h2>
       <div class="plugin-list">
         <div class="plugin-card">
           <div class="plugin-info">
-            <span class="plugin-title">UMD 版</span>
-            <span class="plugin-desc">适用于浏览器直接引入，支持全局 Translator 对象。</span>
+            <span class="plugin-title" data-translate="native-js-plugin">原生js插件</span>
+            <span class="plugin-desc" data-translate="for-frontend-projects">适用于前端工程化项目</span>
           </div>
-          <a href="/static/js/translator.umd.js" download class="download-btn">下载</a>
-        </div>
-        <div class="plugin-card">
-          <div class="plugin-info">
-            <span class="plugin-title">UMD 压缩版</span>
-            <span class="plugin-desc">体积更小，适合生产环境，浏览器直接引入。</span>
-          </div>
-          <a href="/static/js/translator.umd.min.js" download class="download-btn">下载</a>
-        </div>
-        <div class="plugin-card">
-          <div class="plugin-info">
-            <span class="plugin-title">ESM 版</span>
-            <span class="plugin-desc">适用于现代前端工程化项目，支持 import。</span>
-          </div>
-          <a href="/static/js/translator.esm.js" download class="download-btn">下载</a>
+          <a href="/static/js/translator.js" download class="download-btn" data-translate="download-btn">下载</a>
         </div>
       </div>
     </div>
-    <div id="plugin-doc"></div>
+    
+    <div id="plugin-doc">
+      <!-- 中文文档内容 -->
+      <div class="plugin-content zh">
+        <h1>Translator.js API 文档</h1>
+    
+        <p><code>Translator.js</code> 是一个适用于东盟多语言场景的翻译 API 前端插件，基于异步翻译服务，支持通用翻译、东盟十国快捷翻译、批量翻译、缓存控制等功能。</p>
+    
+        <h2>初始化</h2>
+    
+        <pre><code class="language-js">// 初始化翻译器
+const translator = new BaiduTranslator('/api'); // 默认API路径为 '/api'</code></pre>
+    
+        <h2>核心方法</h2>
+    
+        <h3>1. 通用翻译</h3>
+    
+        <pre><code class="language-js">translator.translate(text, fromLang = 'auto', toLang = 'zh', useCache = true, options = {})
+  .then(result => console.log(result.translatedText));</code></pre>
+    
+        <p><strong>参数说明：</strong></p>
+        <ul>
+          <li><code>text</code> (string, 必填)：要翻译的文本</li>
+          <li><code>fromLang</code> (string, 可选)：源语言代码，默认 'auto'</li>
+          <li><code>toLang</code> (string, 可选)：目标语言代码，默认 'zh'</li>
+          <li><code>useCache</code> (boolean, 可选)：是否使用缓存，默认 true</li>
+          <li><code>options</code> (object, 可选)：
+            <ul>
+              <li><code>fontSize</code> (string)：建议字体大小（如 '24px'）</li>
+            </ul>
+          </li>
+        </ul>
+    
+        <p><strong>返回值：</strong></p>
+        <pre><code class="language-json">{
+  "from": "zh",
+  "to": "en",
+  "trans_result": [{ "src": "你好", "dst": "Hello" }],
+  "font_size": "24px",
+  "translatedText": "Hello" // 便捷访问属性
+}</code></pre>
+    
+        <h3>2. 批量翻译</h3>
+    
+        <pre><code class="language-js">translator.batchTranslate(items, fromLang = 'auto', toLang = 'zh', options = {})
+  .then(results => console.log(results));</code></pre>
+    
+        <p><strong>参数说明：</strong></p>
+        <ul>
+          <li><code>items</code> (Array, 必填)：要翻译的文本数组，可以是：
+            <ul>
+              <li>字符串数组: <code>['文本1', '文本2']</code></li>
+              <li>对象数组: <code>[{text: '文本1', id: 'id1'}, {text: '文本2', id: 'id2'}]</code></li>
+            </ul>
+          </li>
+          <li><code>fromLang</code> (string, 可选)：源语言代码，默认 'auto'</li>
+          <li><code>toLang</code> (string, 可选)：目标语言代码，默认 'zh'</li>
+          <li><code>options</code> (object, 可选)：
+            <ul>
+              <li><code>fontSize</code> (string)：建议字体大小</li>
+              <li><code>maxConcurrent</code> (number)：最大并发请求数</li>
+            </ul>
+          </li>
+        </ul>
+    
+        <p><strong>返回值：</strong></p>
+        <pre><code class="language-json">{
+  "results": [
+    {
+      "from": "zh",
+      "to": "en",
+      "trans_result": [{ "src": "你好", "dst": "Hello" }],
+      "id": "id1",
+      "index": 0
+    },
+    ...
+  ],
+  "total": 2,
+  "success": 2,
+  "failed": 0
+}</code></pre>
+    
+        <h3>3. 获取支持的语言列表</h3>
+    
+        <pre><code class="language-js">translator.getLanguages()
+  .then(languages => console.log(languages));</code></pre>
+    
+        <p><strong>返回值：</strong></p>
+        <pre><code class="language-json">{
+  "auto": "自动检测",
+  "zh": "中文",
+  "en": "英语",
+  "th": "泰语",
+  ...
+}</code></pre>
+    
+        <h3>4. 健康检查</h3>
+    
+        <pre><code class="language-js">translator.healthCheck()
+  .then(status => console.log(status));</code></pre>
+    
+        <p><strong>返回值：</strong></p>
+        <pre><code class="language-json">{
+  "status": "healthy",
+  "version": "2.0.0",
+  "cache": {
+    "connected": true,
+    "hit_rate": 0.75
+  }
+}</code></pre>
+    
+        <h2>快捷翻译方法</h2>
+    
+        <h3>1. 特定语言翻译</h3>
+    
+        <p>以下方法自动将中文翻译为目标语言：</p>
+    
+        <pre><code class="language-js">// 翻译到英语
+translator.translateToEnglish('你好世界', { fontSize: '24px' })
+  .then(result => console.log(result.translatedText));
+
+// 翻译到泰语
+translator.translateToThai('你好世界', { fontSize: '32px' })
+  .then(result => console.log(result.translatedText));</code></pre>
+    
+        <p><strong>支持的方法：</strong></p>
+        <ul>
+          <li><code>translateToIndonesian(text, options)</code> - 翻译到印尼语</li>
+          <li><code>translateToMalay(text, options)</code> - 翻译到马来语</li>
+          <li><code>translateToFilipino(text, options)</code> - 翻译到菲律宾语</li>
+          <li><code>translateToBurmese(text, options)</code> - 翻译到缅甸语</li>
+          <li><code>translateToKhmer(text, options)</code> - 翻译到高棉语</li>
+          <li><code>translateToLao(text, options)</code> - 翻译到老挝语</li>
+          <li><code>translateToThai(text, options)</code> - 翻译到泰语</li>
+          <li><code>translateToVietnamese(text, options)</code> - 翻译到越南语</li>
+          <li><code>translateToEnglish(text, options)</code> - 翻译到英语</li>
+          <li><code>translateToChinese(text, options)</code> - 翻译到中文</li>
+          <li><code>translateToTamil(text, options)</code> - 翻译到泰米尔语</li>
+        </ul>
+    
+        <h3>2. 特定语言批量翻译</h3>
+    
+        <p>以下方法自动批量将中文翻译为目标语言：</p>
+    
+        <pre><code class="language-js">// 批量翻译到英语
+translator.batchTranslateToEnglish([
+  { text: '你好', id: 'greeting' },
+  { text: '世界', id: 'world' },
+  '中国'  // 直接使用字符串也可以
+], { fontSize: '24px', maxConcurrent: 5 })
+  .then(results => console.log(results));</code></pre>
+    
+        <p><strong>支持的方法：</strong></p>
+        <ul>
+          <li><code>batchTranslateToIndonesian(items, options)</code> - 批量翻译到印尼语</li>
+          <li><code>batchTranslateToMalay(items, options)</code> - 批量翻译到马来语</li>
+          <li><code>batchTranslateToFilipino(items, options)</code> - 批量翻译到菲律宾语</li>
+          <li><code>batchTranslateToBurmese(items, options)</code> - 批量翻译到缅甸语</li>
+          <li><code>batchTranslateToKhmer(items, options)</code> - 批量翻译到高棉语</li>
+          <li><code>batchTranslateToLao(items, options)</code> - 批量翻译到老挝语</li>
+          <li><code>batchTranslateToThai(items, options)</code> - 批量翻译到泰语</li>
+          <li><code>batchTranslateToVietnamese(items, options)</code> - 批量翻译到越南语</li>
+          <li><code>batchTranslateToEnglish(items, options)</code> - 批量翻译到英语</li>
+          <li><code>batchTranslateToChinese(items, options)</code> - 批量翻译到中文</li>
+          <li><code>batchTranslateToTamil(items, options)</code> - 批量翻译到泰米尔语</li>
+        </ul>
+    
+        <h2>实用示例</h2>
+    
+        <h3>前端展示翻译结果并设置字体大小</h3>
+    
+        <pre><code class="language-js">// 单文本翻译
+translator.translateToThai('你好世界', { fontSize: '32px' })
+  .then(result => {
+    const element = document.getElementById('greeting');
+    element.innerText = result.translatedText;
+    if (result.font_size) {
+      element.style.fontSize = result.font_size;
+    }
+  });
+
+// 批量翻译
+translator.batchTranslateToEnglish([
+  { text: '你好', id: 'greeting' },
+  { text: '世界', id: 'world' }
+], { fontSize: '24px' })
+  .then(response => {
+    // 处理结果
+    response.results.forEach(result => {
+      const element = document.getElementById(result.id);
+      if (element) {
+        element.innerText = result.trans_result[0].dst;
+        if (response.font_size) {
+          element.style.fontSize = response.font_size;
+        }
+      }
+    });
+  });</code></pre>
+    
+        <h3>自定义错误处理</h3>
+    
+        <pre><code class="language-js">translator.translate('你好', 'zh', 'en')
+  .then(result => {
+    // 成功处理
+    console.log(result.translatedText);
+  })
+  .catch(error => {
+    // 错误处理
+    console.error('翻译失败:', error.message);
+    showErrorToUser('翻译服务暂时不可用，请稍后再试');
+  });</code></pre>
+    
+        <h2>支持语言列表</h2>
+    
+        <table>
+          <thead>
+            <tr>
+              <th>语言代码</th>
+              <th>语言名称</th>
+              <th>方法后缀</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>auto</td>
+              <td>自动检测</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td>zh</td>
+              <td>中文</td>
+              <td>Chinese</td>
+            </tr>
+            <tr>
+              <td>en</td>
+              <td>英语</td>
+              <td>English</td>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>印尼语</td>
+              <td>Indonesian</td>
+            </tr>
+            <tr>
+              <td>ms</td>
+              <td>马来语</td>
+              <td>Malay</td>
+            </tr>
+            <tr>
+              <td>fil</td>
+              <td>菲律宾语</td>
+              <td>Filipino</td>
+            </tr>
+            <tr>
+              <td>my</td>
+              <td>缅甸语</td>
+              <td>Burmese</td>
+            </tr>
+            <tr>
+              <td>km</td>
+              <td>高棉语</td>
+              <td>Khmer</td>
+            </tr>
+            <tr>
+              <td>lo</td>
+              <td>老挝语</td>
+              <td>Lao</td>
+            </tr>
+            <tr>
+              <td>th</td>
+              <td>泰语</td>
+              <td>Thai</td>
+            </tr>
+            <tr>
+              <td>vie</td>
+              <td>越南语</td>
+              <td>Vietnamese</td>
+            </tr>
+            <tr>
+              <td>ta</td>
+              <td>泰米尔语</td>
+              <td>Tamil</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- 英文文档内容 - 初始隐藏 -->
+      <div class="plugin-content en hidden-en" id="plugin-doc-english"></div>
+    </div>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+
+  <!-- 悬浮语言切换器 -->
+  <div class="floating-language-switcher">
+    <div class="language-toggle" id="language-toggle">
+      <span id="current-language">中</span>
+    </div>
+    <div class="language-options" id="language-options">
+      <button class="language-option active" data-lang="zh">中文</button>
+      <button class="language-option" data-lang="en">English</button>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="/static/js/translator.js"></script>
   <script>
-    fetch('/translate/static/translator.md')
-      .then(res => res.text())
-      .then(md => {
-        document.getElementById('plugin-doc').innerHTML = marked.parse(md);
-        document.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+    // 初始化翻译器
+    const translator = new BaiduTranslator('/api');
+
+    // 定义页面UI元素文本
+    const translations = {
+      zh: {
+        "back-home": "返回首页",
+        "plugin-download": "插件下载",
+        "native-js-plugin": "原生js插件",
+        "for-frontend-projects": "适用于前端工程化项目",
+        "download-btn": "下载",
+        "current-language": "中"
+      },
+      en: {
+        "back-home": "Back to Home",
+        "plugin-download": "Plugin Download",
+        "native-js-plugin": "Native JS Plugin",
+        "for-frontend-projects": "For frontend projects",
+        "download-btn": "Download",
+        "current-language": "EN"
+      }
+    };
+
+    // 当前语言
+    let currentLang = 'zh';
+    let isTranslated = false;
+    
+    // 语法高亮
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
       });
+    });
+
+    // 翻译页面UI元素
+    function translateUI(targetLang) {
+      const elements = document.querySelectorAll('[data-translate]');
+      elements.forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (translations[targetLang] && translations[targetLang][key]) {
+          el.textContent = translations[targetLang][key];
+        }
+      });
+      
+      // 更新悬浮窗显示的当前语言
+      document.getElementById('current-language').textContent = translations[targetLang]['current-language'];
+    }
+    
+    // 翻译插件文档内容
+    async function translatePluginDoc(targetLang) {
+      if (targetLang === 'zh') {
+        // 显示中文内容，隐藏英文内容
+        document.querySelector('.plugin-content.zh').style.display = 'block';
+        document.querySelector('.plugin-content.en').style.display = 'none';
+        return;
+      }
+      
+      try {
+        // 如果已经翻译过，直接切换显示
+        if (isTranslated) {
+          document.querySelector('.plugin-content.zh').style.display = 'none';
+          document.querySelector('.plugin-content.en').style.display = 'block';
+          return;
+        }
+        
+        // 获取所有需要翻译的元素
+        const elementsToTranslate = document.querySelectorAll('.plugin-content.zh h1, .plugin-content.zh h2, .plugin-content.zh h3, .plugin-content.zh p, .plugin-content.zh li, .plugin-content.zh th, .plugin-content.zh td');
+        
+        // 克隆中文内容作为英文内容的基础
+        const englishContent = document.querySelector('.plugin-content.zh').cloneNode(true);
+        englishContent.classList.remove('zh');
+        englishContent.classList.add('en');
+        
+        // 将所有需要翻译的文本收集起来
+        const textsToTranslate = [];
+        elementsToTranslate.forEach((el, index) => {
+          // 跳过代码块内容和空元素
+          if (!el.closest('pre') && el.textContent.trim()) {
+            textsToTranslate.push({
+              text: el.textContent,
+              id: `text_${index}`
+            });
+          }
+        });
+        
+        // 批量翻译收集到的文本
+        if (textsToTranslate.length > 0) {
+          const response = await fetch(`${translator.baseUrl}/batch/translate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              items: textsToTranslate,
+              from_lang: 'zh',
+              to_lang: 'en'
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`翻译API返回错误: ${response.status}`);
+          }
+          
+          const result = await response.json();
+          
+          if (result && result.results) {
+            // 替换英文内容的对应文本
+            let index = 0;
+            const englishElements = englishContent.querySelectorAll('h1, h2, h3, p, li, th, td');
+            
+            englishElements.forEach(el => {
+              // 跳过代码块内容和空元素
+              if (!el.closest('pre') && el.textContent.trim()) {
+                const translatedItem = result.results.find(item => item.id === `text_${index}`);
+                if (translatedItem && translatedItem.trans_result && translatedItem.trans_result.length > 0) {
+                  el.textContent = translatedItem.trans_result[0].dst;
+                }
+                index++;
+              }
+            });
+            
+            // 标记已翻译
+            isTranslated = true;
+          }
+          
+          // 替换英文文档内容并显示
+          const container = document.getElementById('plugin-doc-english');
+          container.innerHTML = '';
+          container.appendChild(englishContent);
+          
+          // 应用代码高亮
+          container.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+          });
+          
+          document.querySelector('.plugin-content.zh').style.display = 'none';
+          document.querySelector('.plugin-content.en').style.display = 'block';
+          container.classList.remove('hidden-en');
+        }
+        
+      } catch (error) {
+        console.error('翻译文档出错:', error);
+      }
+    }
+
+    // 悬浮窗语言切换逻辑
+    document.getElementById('language-toggle').addEventListener('click', function() {
+      document.getElementById('language-options').classList.toggle('active');
+    });
+
+    // 点击页面其他地方关闭语言选项
+    document.addEventListener('click', function(event) {
+      if (!event.target.closest('.floating-language-switcher')) {
+        document.getElementById('language-options').classList.remove('active');
+      }
+    });
+
+    // 语言切换事件
+    document.querySelectorAll('.language-option').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const targetLang = this.getAttribute('data-lang');
+        if (targetLang === currentLang) return;
+        
+        // 更新按钮样式
+        document.querySelectorAll('.language-option').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 更新当前语言
+        currentLang = targetLang;
+        
+        // 保存语言偏好到localStorage
+        localStorage.setItem('preferredLanguage', targetLang);
+        
+        // 翻译UI元素
+        translateUI(targetLang);
+        
+        // 翻译文档内容
+        await translatePluginDoc(targetLang);
+        
+        // 关闭语言选项面板
+        document.getElementById('language-options').classList.remove('active');
+      });
+    });
+
+    // 检查是否有保存的语言偏好
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedLanguage = localStorage.getItem('preferredLanguage');
+      if (savedLanguage && savedLanguage !== currentLang) {
+        // 触发语言切换
+        const langBtn = document.querySelector(`.language-option[data-lang="${savedLanguage}"]`);
+        if (langBtn) {
+          langBtn.click();
+        }
+      }
+      
+      // 应用代码高亮
+      document.querySelectorAll('pre code').forEach(block => {
+        hljs.highlightElement(block);
+      });
+    });
   </script>
 </body>
-</html> 
+</html>
