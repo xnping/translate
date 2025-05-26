@@ -222,6 +222,48 @@
       font-weight: bold;
       color: #4b8bf4;
     }
+    /* 滚动到顶部按钮 */
+    .scroll-top {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #6c757d;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .scroll-top.visible {
+      opacity: 1;
+    }
+    .scroll-top:hover {
+      background: #5a6268;
+    }
+    /* 翻译进度指示器 */
+    .translation-progress {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+    .translation-progress.visible {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -643,236 +685,190 @@ translator.batchTranslate(
 
   <!-- 悬浮语言切换器 -->
   <div class="floating-language-switcher">
-    <div class="language-toggle" id="language-toggle">
-      <span id="current-language">中</span>
-    </div>
-    <div class="language-options" id="language-options">
-      <button class="language-option active" data-lang="zh">中文</button>
-      <button class="language-option" data-lang="en">English</button>
+    <div class="language-toggle">中/英</div>
+    <div class="language-options">
+      <button class="language-btn active" data-lang="zh">中文</button>
+      <button class="language-btn" data-lang="en">English</button>
     </div>
   </div>
 
+  <!-- 滚动到顶部按钮 -->
+  <div class="scroll-top">
+    ↑
+  </div>
+
+  <!-- 翻译进度指示器 -->
+  <div class="translation-progress">
+    正在翻译...
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-  <script src="/static/js/translator.js"></script>
+  <script src="js/translator.js"></script>
+  <script src="js/lazy-translator.js"></script>
   <script>
+    // 初始化代码高亮
+    hljs.highlightAll();
+    
     // 初始化翻译器
     const translator = new BaiduTranslator('/api');
-
-    // 定义页面UI元素文本
-    const translations = {
-      zh: {
-        "site-title": "翻译API官网",
-        "plugin-page": "插件页",
-        "language-label": "语言：",
-        "github-link": "GitHub",
-        "footer-text": "© 2023 翻译API服务 | 提供东盟十国语言翻译服务",
-        "current-language": "中"
-      },
-      en: {
-        "site-title": "Translation API Website",
-        "plugin-page": "Plugin Page",
-        "language-label": "Language:",
-        "github-link": "GitHub",
-        "footer-text": "© 2023 Translation API Service | Providing translation services for ASEAN languages",
-        "current-language": "EN"
-      }
-    };
-
-    // 当前语言
-    let currentLang = 'zh';
-    let isTranslated = false;
     
-    // 语法高亮
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('pre code').forEach(block => {
-        hljs.highlightElement(block);
-      });
+    // 获取保存的语言偏好
+    const preferredLang = localStorage.getItem('preferred_language') || 'zh';
+    console.log("当前语言偏好:", preferredLang);
+    
+    // 设置对应按钮为激活状态
+    const languageBtns = document.querySelectorAll('.language-btn');
+    languageBtns.forEach(btn => {
+      if (btn.getAttribute('data-lang') === preferredLang) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
     });
-
-    // 翻译页面UI元素
-    function translateUI(targetLang) {
-      const elements = document.querySelectorAll('[data-translate]');
-      elements.forEach(el => {
-        const key = el.getAttribute('data-translate');
-        if (translations[targetLang] && translations[targetLang][key]) {
-          el.textContent = translations[targetLang][key];
-        }
-      });
-      
-      // 更新悬浮窗显示的当前语言
-      document.getElementById('current-language').textContent = translations[targetLang]['current-language'];
-    }
     
-    // 增强Markdown渲染
-    function enhanceRenderedContent(html) {
-      // 增强渲染的HTML内容，添加额外样式和交互
-      let enhanced = html;
-      
-      // 为接口路径添加样式
-      enhanced = enhanced.replace(/<code>GET\s+([^<]+)<\/code>/g, '<code>GET</code> <span class="endpoint">$1</span>');
-      enhanced = enhanced.replace(/<code>POST\s+([^<]+)<\/code>/g, '<code>POST</code> <span class="endpoint">$1</span>');
-      
-      // 为各个API部分添加包装
-      enhanced = enhanced.replace(/<h2>(.*?)<\/h2>/g, '</div><div class="api-section"><h2>$1</h2>');
-      
-      // 闭合第一个和最后一个div
-      enhanced = enhanced.replace('</div>', '', 1);
-      enhanced = enhanced + '</div>';
-      
-      return enhanced;
-    }
+    // 初始化懒加载翻译器 - 注意：只有非中文语言需要翻译
+    const lazyTranslator = new LazyTranslator(translator, {
+      fromLang: preferredLang === 'zh' ? 'en' : 'zh',
+      toLang: preferredLang,
+      selector: '[data-translate]',
+      batchSize: 5,
+      debounceDelay: 200
+    }).init();
     
-    // 翻译API文档内容
-    async function translateApiDoc(targetLang) {
-      if (targetLang === 'zh') {
-        // 显示中文内容，隐藏英文内容
-        document.querySelector('.api-content.zh').style.display = 'block';
-        document.querySelector('.api-content.en').style.display = 'none';
-        return;
-      }
+    // 翻译进度指示器
+    const progressIndicator = document.querySelector('.translation-progress');
+    
+    // 如果初始语言不是中文，显示翻译进度指示器
+    if (preferredLang !== 'zh') {
+      // 显示翻译进度
+      progressIndicator.classList.add('visible');
       
-      try {
-        // 如果已经翻译过，直接切换显示
-        if (isTranslated) {
-          document.querySelector('.api-content.zh').style.display = 'none';
-          document.querySelector('.api-content.en').style.display = 'block';
-          return;
-        }
-        
-        // 获取所有需要翻译的元素
-        const elementsToTranslate = document.querySelectorAll('.api-content.zh h1, .api-content.zh h2, .api-content.zh p, .api-content.zh li, .api-content.zh th, .api-content.zh td');
-        
-        // 克隆中文内容作为英文内容的基础
-        const englishContent = document.querySelector('.api-content.zh').cloneNode(true);
-        englishContent.classList.remove('zh');
-        englishContent.classList.add('en');
-        
-        // 将所有需要翻译的文本收集起来
-        const textsToTranslate = [];
-        elementsToTranslate.forEach((el, index) => {
-          // 跳过代码块内容和空元素
-          if (!el.closest('pre') && el.textContent.trim()) {
-            textsToTranslate.push({
-              text: el.textContent,
-              id: `text_${index}`
-            });
-          }
-        });
-        
-        // 批量翻译收集到的文本
-        if (textsToTranslate.length > 0) {
-          const response = await fetch(`${translator.baseUrl}/batch/translate`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              items: textsToTranslate,
-              from_lang: 'zh',
-              to_lang: 'en'
-            })
+      // 紧急修复 - 直接翻译关键元素
+      setTimeout(async () => {
+        // 直接翻译几个重要的元素
+        console.log("尝试直接翻译关键元素");
+        try {
+          // 取得所有带data-translate属性的元素
+          const transElements = document.querySelectorAll('[data-translate]');
+          console.log(`找到${transElements.length}个带翻译属性的元素`);
+          
+          // 创建批量翻译请求
+          const textsToTranslate = [];
+          const elementsMap = {};
+          
+          transElements.forEach((el, idx) => {
+            const text = el.textContent.trim();
+            if (text) {
+              const id = `direct-${idx}`;
+              textsToTranslate.push({
+                text: text,
+                id: id
+              });
+              elementsMap[id] = el;
+            }
           });
           
-          if (!response.ok) {
-            throw new Error(`翻译API返回错误: ${response.status}`);
-          }
-          
-          const result = await response.json();
-          
-          if (result && result.results) {
-            // 替换英文内容的对应文本
-            let index = 0;
-            const englishElements = englishContent.querySelectorAll('h1, h2, p, li, th, td');
+          if (textsToTranslate.length > 0) {
+            console.log(`直接翻译${textsToTranslate.length}个元素...`);
             
-            englishElements.forEach(el => {
-              // 跳过代码块内容和空元素
-              if (!el.closest('pre') && el.textContent.trim()) {
-                const translatedItem = result.results.find(item => item.id === `text_${index}`);
-                if (translatedItem && translatedItem.trans_result && translatedItem.trans_result.length > 0) {
-                  el.textContent = translatedItem.trans_result[0].dst;
+            // 调用API翻译
+            const result = await translator.batchTranslate(
+              textsToTranslate,
+              'zh',  // 源语言
+              'en'   // 目标语言
+            );
+            
+            console.log("直接翻译返回结果:", result);
+            
+            // 应用翻译结果
+            if (result && result.results) {
+              result.results.forEach(item => {
+                if (item.trans_result && item.trans_result.length > 0) {
+                  const element = elementsMap[item.id];
+                  if (element) {
+                    const translated = item.trans_result[0].dst;
+                    console.log(`直接更新元素: ${item.trans_result[0].src} -> ${translated}`);
+                    element.textContent = translated;
+                  }
                 }
-                index++;
-              }
-            });
-            
-            // 标记已翻译
-            isTranslated = true;
+              });
+            }
           }
-          
-          // 替换英文文档内容并显示
-          const container = document.getElementById('api-doc-english');
-          container.innerHTML = '';
-          container.appendChild(englishContent);
-          
-          // 应用代码高亮
-          container.querySelectorAll('pre code').forEach(block => {
-            hljs.highlightElement(block);
-          });
-          
-          document.querySelector('.api-content.zh').style.display = 'none';
-          document.querySelector('.api-content.en').style.display = 'block';
-          container.classList.remove('hidden-en');
+        } catch (err) {
+          console.error("直接翻译失败:", err);
         }
-        
-      } catch (error) {
-        console.error('翻译文档出错:', error);
-      }
+      }, 1500);
+      
+      // 3秒后隐藏进度指示器
+      setTimeout(() => {
+        progressIndicator.classList.remove('visible');
+      }, 3000);
     }
-
-    // 悬浮窗语言切换逻辑
-    document.getElementById('language-toggle').addEventListener('click', function() {
-      document.getElementById('language-options').classList.toggle('active');
-    });
-
-    // 点击页面其他地方关闭语言选项
-    document.addEventListener('click', function(event) {
-      if (!event.target.closest('.floating-language-switcher')) {
-        document.getElementById('language-options').classList.remove('active');
+    
+    // 语言切换逻辑
+    const languageToggle = document.querySelector('.language-toggle');
+    const languageOptions = document.querySelector('.language-options');
+    
+    // 显示语言选项
+    languageToggle.addEventListener('click', function() {
+      if (languageOptions.style.display === 'block') {
+        languageOptions.style.display = 'none';
+      } else {
+        languageOptions.style.display = 'block';
       }
     });
-
-    // 语言切换事件
-    document.querySelectorAll('.language-option').forEach(btn => {
-      btn.addEventListener('click', async function() {
-        const targetLang = this.getAttribute('data-lang');
-        if (targetLang === currentLang) return;
+    
+    // 语言切换
+    languageBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const lang = this.getAttribute('data-lang');
         
-        // 更新按钮样式
-        document.querySelectorAll('.language-option').forEach(b => b.classList.remove('active'));
+        // 更新按钮状态
+        languageBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         
-        // 更新当前语言
-        currentLang = targetLang;
+        // 保存语言偏好
+        localStorage.setItem('preferred_language', lang);
         
-        // 保存语言偏好到localStorage
-        localStorage.setItem('preferredLanguage', targetLang);
+        // 显示翻译进度
+        progressIndicator.classList.add('visible');
         
-        // 翻译UI元素
-        translateUI(targetLang);
+        // 切换翻译器语言
+        lazyTranslator.changeLanguage(lang);
         
-        // 翻译API文档内容
-        await translateApiDoc(targetLang);
+        // 3秒后隐藏进度指示器
+        setTimeout(() => {
+          progressIndicator.classList.remove('visible');
+        }, 3000);
         
-        // 关闭语言选项面板
-        document.getElementById('language-options').classList.remove('active');
+        // 隐藏选项
+        languageOptions.style.display = 'none';
       });
     });
-
-    // 检查是否有保存的语言偏好
-    document.addEventListener('DOMContentLoaded', function() {
-      const savedLanguage = localStorage.getItem('preferredLanguage');
-      if (savedLanguage && savedLanguage !== currentLang) {
-        // 触发语言切换
-        const langBtn = document.querySelector(`.language-option[data-lang="${savedLanguage}"]`);
-        if (langBtn) {
-          langBtn.click();
-        }
+    
+    // 滚动到顶部
+    const scrollTopBtn = document.querySelector('.scroll-top');
+    
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
       }
-      
-      // 应用代码高亮
-      document.querySelectorAll('pre code').forEach(block => {
-        hljs.highlightElement(block);
+    });
+    
+    scrollTopBtn.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
       });
+    });
+    
+    // 点击文档其他位置关闭语言选项
+    document.addEventListener('click', function(event) {
+      if (!event.target.closest('.floating-language-switcher')) {
+        languageOptions.style.display = 'none';
+      }
     });
   </script>
 </body>

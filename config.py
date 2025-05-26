@@ -151,6 +151,6 @@ APP_CONFIG = {
     'CORS_ORIGINS': ["*"],  # 允许所有来源，生产环境中应限制
     'STATIC_DIR': 'static',
     'HOST': '0.0.0.0',
-    'PORT': 8000,
+    'PORT': 9000,
     'DEBUG': config.get('app', 'debug'),
 } 

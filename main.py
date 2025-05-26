@@ -343,7 +343,7 @@ app.mount("/translate/static", StaticFiles(directory="static"), name="translate_
 # 启动服务器命令: uvicorn main:app --reload
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=9000, reload=True)
 
 if os.path.exists('api.md') and not os.path.exists('static/api.md'):
     shutil.move('api.md', 'static/api.md')

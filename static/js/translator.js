@@ -137,7 +137,18 @@ class BaiduTranslator {
         throw new Error(errorData.error || `请求失败: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      
+      // 为每个结果项添加translatedText字段方便访问
+      if (result && result.results) {
+        result.results.forEach(item => {
+          if (item.trans_result && item.trans_result.length > 0) {
+            item.translatedText = item.trans_result[0].dst;
+          }
+        });
+      }
+
+      return result;
     } catch (error) {
       console.error('批量翻译出错:', error);
       throw error;
@@ -269,7 +280,18 @@ class BaiduTranslator {
           throw new Error(errorData.error || `请求失败: ${response.status}`);
         }
 
-        return await response.json();
+        const result = await response.json();
+        
+        // 为每个结果项添加translatedText字段方便访问
+        if (result && result.results) {
+          result.results.forEach(item => {
+            if (item.trans_result && item.trans_result.length > 0) {
+              item.translatedText = item.trans_result[0].dst;
+            }
+          });
+        }
+
+        return result;
       } catch (error) {
         console.error(`批量翻译到${langName}出错:`, error);
         throw error;
