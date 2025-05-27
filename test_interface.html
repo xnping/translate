@@ -160,6 +160,13 @@
                         <option value="zh">中文</option>
                         <option value="th">泰语</option>
                         <option value="vie">越南语</option>
+                        <option value="id">印尼语</option>
+                        <option value="may">马来语</option>
+                        <option value="fil">菲律宾语</option>
+                        <option value="bur">缅甸语</option>
+                        <option value="hkm">高棉语</option>
+                        <option value="lao">老挝语</option>
+                        <option value="tam">泰米尔语</option>
                     </select>
                 </div>
                 <button class="test-button" onclick="testTranslate()">测试翻译</button>
@@ -212,10 +219,10 @@
             if (!resultId) {
                 resultId = 'result-' + endpoint.split('/').pop();
             }
-            
+
             const button = event.target;
             const result = document.getElementById(resultId);
-            
+
             button.disabled = true;
             button.innerHTML = '<span class="loading"></span> 测试中...';
             result.style.display = 'none';
@@ -236,7 +243,7 @@
                 const responseData = await response.json();
 
                 result.className = 'result ' + (response.ok ? 'success' : 'error');
-                
+
                 if (response.ok && responseData.trans_result) {
                     // 翻译结果美化显示
                     let displayText = `✅ 翻译成功 (${response.status})\n\n`;
@@ -258,7 +265,7 @@
                 } else {
                     result.textContent = JSON.stringify(responseData, null, 2);
                 }
-                
+
                 result.style.display = 'block';
 
             } catch (error) {
@@ -267,7 +274,7 @@
                 result.style.display = 'block';
             } finally {
                 button.disabled = false;
-                button.textContent = button.textContent.includes('健康') ? '测试健康检查' : 
+                button.textContent = button.textContent.includes('健康') ? '测试健康检查' :
                                    button.textContent.includes('语言') ? '获取语言列表' :
                                    button.textContent.includes('状态') ? '获取系统状态' : '测试接口';
             }
@@ -277,7 +284,7 @@
             const text = document.getElementById('translate-text').value;
             const from_lang = document.getElementById('translate-from').value;
             const to_lang = document.getElementById('translate-to').value;
-            
+
             const data = { text, from_lang, to_lang };
             testApi('/api/translate', 'POST', data, 'result-translate');
         }
@@ -291,7 +298,7 @@
         function testBatch() {
             const itemsText = document.getElementById('batch-items').value;
             const to_lang = document.getElementById('batch-to').value;
-            
+
             try {
                 const items = JSON.parse(itemsText);
                 const data = { items, from_lang: 'zh', to_lang };

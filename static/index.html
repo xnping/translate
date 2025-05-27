@@ -408,8 +408,24 @@
                     method: 'POST',
                     fields: [
                         { name: 'text', label: '要翻译的文本', type: 'textarea', required: true, placeholder: '请输入要翻译的文本' },
-                        { name: 'from_lang', label: '源语言', type: 'select', options: ['auto', 'zh', 'en', 'th', 'vie'], default: 'zh' },
-                        { name: 'to_lang', label: '目标语言', type: 'select', options: ['zh', 'en', 'th', 'vie', 'id', 'ms', 'fil', 'my', 'km', 'lo', 'ta'], default: 'en' },
+                        { name: 'from_lang', label: '源语言', type: 'select', options: [
+                            {value: 'auto', text: '自动检测'},
+                            {value: 'zh', text: '中文'},
+                            {value: 'en', text: '英语'}
+                        ], default: 'zh' },
+                        { name: 'to_lang', label: '目标语言', type: 'select', options: [
+                            {value: 'zh', text: '中文'},
+                            {value: 'en', text: '英语'},
+                            {value: 'th', text: '泰语'},
+                            {value: 'vie', text: '越南语'},
+                            {value: 'id', text: '印尼语'},
+                            {value: 'may', text: '马来语'},
+                            {value: 'fil', text: '菲律宾语'},
+                            {value: 'bur', text: '缅甸语'},
+                            {value: 'hkm', text: '高棉语'},
+                            {value: 'lao', text: '老挝语'},
+                            {value: 'tam', text: '泰米尔语'}
+                        ], default: 'en' },
                         { name: 'font_size', label: '字体大小(可选)', type: 'text', placeholder: '如: 24px' }
                     ]
                 },
@@ -419,8 +435,24 @@
                     method: 'POST',
                     fields: [
                         { name: 'text', label: '要翻译的文本', type: 'textarea', required: true, placeholder: '请输入要翻译的文本' },
-                        { name: 'from_lang', label: '源语言', type: 'select', options: ['auto', 'zh', 'en'], default: 'zh' },
-                        { name: 'to_lang', label: '目标语言', type: 'select', options: ['zh', 'en', 'th', 'vie'], default: 'en' }
+                        { name: 'from_lang', label: '源语言', type: 'select', options: [
+                            {value: 'auto', text: '自动检测'},
+                            {value: 'zh', text: '中文'},
+                            {value: 'en', text: '英语'}
+                        ], default: 'zh' },
+                        { name: 'to_lang', label: '目标语言', type: 'select', options: [
+                            {value: 'zh', text: '中文'},
+                            {value: 'en', text: '英语'},
+                            {value: 'th', text: '泰语'},
+                            {value: 'vie', text: '越南语'},
+                            {value: 'id', text: '印尼语'},
+                            {value: 'may', text: '马来语'},
+                            {value: 'fil', text: '菲律宾语'},
+                            {value: 'bur', text: '缅甸语'},
+                            {value: 'hkm', text: '高棉语'},
+                            {value: 'lao', text: '老挝语'},
+                            {value: 'tam', text: '泰米尔语'}
+                        ], default: 'en' }
                     ]
                 },
 
@@ -523,8 +555,24 @@
                     method: 'POST',
                     fields: [
                         { name: 'items', label: '翻译项目(JSON数组)', type: 'textarea', required: true, placeholder: '["你好", "世界"] 或 [{"text":"你好","id":"1"}]' },
-                        { name: 'from_lang', label: '源语言', type: 'select', options: ['auto', 'zh', 'en'], default: 'zh' },
-                        { name: 'to_lang', label: '目标语言', type: 'select', options: ['zh', 'en', 'th', 'vie'], default: 'en' },
+                        { name: 'from_lang', label: '源语言', type: 'select', options: [
+                            {value: 'auto', text: '自动检测'},
+                            {value: 'zh', text: '中文'},
+                            {value: 'en', text: '英语'}
+                        ], default: 'zh' },
+                        { name: 'to_lang', label: '目标语言', type: 'select', options: [
+                            {value: 'zh', text: '中文'},
+                            {value: 'en', text: '英语'},
+                            {value: 'th', text: '泰语'},
+                            {value: 'vie', text: '越南语'},
+                            {value: 'id', text: '印尼语'},
+                            {value: 'may', text: '马来语'},
+                            {value: 'fil', text: '菲律宾语'},
+                            {value: 'bur', text: '缅甸语'},
+                            {value: 'hkm', text: '高棉语'},
+                            {value: 'lao', text: '老挝语'},
+                            {value: 'tam', text: '泰米尔语'}
+                        ], default: 'en' },
                         { name: 'font_size', label: '字体大小(可选)', type: 'text', placeholder: '如: 24px' }
                     ]
                 },
@@ -629,9 +677,16 @@
                         input = document.createElement('select');
                         field.options.forEach(option => {
                             const opt = document.createElement('option');
-                            opt.value = option;
-                            opt.textContent = option;
-                            if (option === field.default) opt.selected = true;
+                            // 支持对象格式 {value: 'code', text: 'name'} 和字符串格式
+                            if (typeof option === 'object') {
+                                opt.value = option.value;
+                                opt.textContent = option.text;
+                                if (option.value === field.default) opt.selected = true;
+                            } else {
+                                opt.value = option;
+                                opt.textContent = option;
+                                if (option === field.default) opt.selected = true;
+                            }
                             input.appendChild(opt);
                         });
                     } else {

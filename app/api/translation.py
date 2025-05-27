@@ -6,8 +6,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any
 
 from app.models.translation import (
-    TranslationRequest, 
-    TranslationResponse, 
+    TranslationRequest,
+    TranslationResponse,
     SingleTargetRequest
 )
 from app.core.dependencies import (
@@ -47,9 +47,9 @@ async def translate_text(
             to_lang=request.to_lang,
             font_size=request.font_size
         )
-        
+
         return result
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
 
@@ -68,12 +68,12 @@ async def translate_optimized(
             use_cache=True,
             font_size=request.font_size
         )
-        
+
         if result.success:
             return result.data
         else:
             raise HTTPException(status_code=400, detail=result.error)
-            
+
     except HTTPException:
         raise
     except Exception as e:
@@ -163,7 +163,7 @@ async def translate_to_malay(
         result = await merger.submit_request(
             text=request.text,
             from_lang="zh",
-            to_lang="ms",
+            to_lang="may",
             font_size=request.font_size
         )
         return result
@@ -199,7 +199,7 @@ async def translate_to_burmese(
         result = await merger.submit_request(
             text=request.text,
             from_lang="zh",
-            to_lang="my",
+            to_lang="bur",
             font_size=request.font_size
         )
         return result
@@ -217,7 +217,7 @@ async def translate_to_khmer(
         result = await merger.submit_request(
             text=request.text,
             from_lang="zh",
-            to_lang="km",
+            to_lang="hkm",
             font_size=request.font_size
         )
         return result
@@ -235,7 +235,7 @@ async def translate_to_lao(
         result = await merger.submit_request(
             text=request.text,
             from_lang="zh",
-            to_lang="lo",
+            to_lang="lao",
             font_size=request.font_size
         )
         return result
@@ -253,7 +253,7 @@ async def translate_to_tamil(
         result = await merger.submit_request(
             text=request.text,
             from_lang="zh",
-            to_lang="ta",
+            to_lang="tam",
             font_size=request.font_size
         )
         return result

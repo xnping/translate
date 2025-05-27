@@ -313,12 +313,12 @@ api.translate('你好世界', 'zh', 'en', '24px')
 | `/api/translate_to_thai` | 泰语 | th |
 | `/api/translate_to_vietnamese` | 越南语 | vie |
 | `/api/translate_to_indonesian` | 印尼语 | id |
-| `/api/translate_to_malay` | 马来语 | ms |
+| `/api/translate_to_malay` | 马来语 | may |
 | `/api/translate_to_filipino` | 菲律宾语 | fil |
-| `/api/translate_to_burmese` | 缅甸语 | my |
-| `/api/translate_to_khmer` | 高棉语 | km |
-| `/api/translate_to_lao` | 老挝语 | lo |
-| `/api/translate_to_tamil` | 泰米尔语 | ta |
+| `/api/translate_to_burmese` | 缅甸语 | bur |
+| `/api/translate_to_khmer` | 高棉语 | hkm |
+| `/api/translate_to_lao` | 老挝语 | lao |
+| `/api/translate_to_tamil` | 泰米尔语 | tam |
 
 #### 请求参数
 | 参数 | 类型 | 必填 | 说明 |

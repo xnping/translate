@@ -230,7 +230,7 @@ async def batch_translate_to_lao(
         result = await translator.translate_batch(
             items=prepared_items,
             from_lang="zh",
-            to_lang="lo",
+            to_lang="lao",
             use_cache=True,
             font_size=request.font_size
         )
