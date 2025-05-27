@@ -6,7 +6,10 @@
 import os
 from functools import lru_cache
 from typing import Optional
-from pydantic_settings import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -67,20 +70,8 @@ class Settings(BaseSettings):
 
     def get_supported_languages(self) -> dict:
         """获取支持的语言列表"""
-        return {
-            "zh": "中文-支持auto",
-            "en": "英语-支持auto",
-            "th": "泰语-支持auto",
-            "vie": "越南语-支持auto",
-            "id": "印尼语-支持auto",
-            "may": "马来语-支持auto",
-            "fil": "菲律宾语-支持auto",
-            "bur": "缅甸语-支持auto",
-            "hkm": "高棉语-支持auto",
-            "lao": "老挝语-不支持auto",
-            "tam": "泰米尔语-支持auto",
-            "auto": "自动检测"
-        }
+        from app.core.language_config import get_supported_languages
+        return get_supported_languages()
 
 
 @lru_cache()

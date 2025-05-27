@@ -1,24 +1,15 @@
-# 重构后的依赖列表
+# 简化的依赖列表 - 避免编译问题
 # 核心框架
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
-
-# 异步HTTP客户端
-aiohttp==3.9.1
-httpx==0.25.2
-
-# Redis缓存
-redis==5.0.1
-aioredis==2.0.1
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+requests
+aiohttp
 
 # 其他依赖
-python-dotenv==1.0.0
-python-multipart==0.0.6
-jinja2==3.1.2
-aiofiles==23.2.1
+python-dotenv
+PyYAML
 
-# 开发和测试
-pytest==7.4.3
-pytest-asyncio==0.21.1
+# Redis缓存 (可选)
+redis

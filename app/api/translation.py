@@ -1,5 +1,6 @@
 """
 翻译相关的API路由
+重构后使用配置驱动的动态路由生成
 """
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -19,6 +20,7 @@ from app.services.translation_service import TranslationService
 from app.services.request_merger import RequestMerger
 from app.services.cache_service import CacheService
 from app.core.config import get_settings
+from app.api.dynamic_routes import register_single_target_routes
 
 router = APIRouter()
 
@@ -80,182 +82,6 @@ async def translate_optimized(
         raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
 
 
-# 单一目标语言翻译接口
-@router.post("/translate_to_english", response_model=TranslationResponse)
-async def translate_to_english(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到英语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="en",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_thai", response_model=TranslationResponse)
-async def translate_to_thai(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到泰语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="th",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_vietnamese", response_model=TranslationResponse)
-async def translate_to_vietnamese(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到越南语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="vie",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_indonesian", response_model=TranslationResponse)
-async def translate_to_indonesian(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到印尼语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="id",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_malay", response_model=TranslationResponse)
-async def translate_to_malay(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到马来语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="may",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_filipino", response_model=TranslationResponse)
-async def translate_to_filipino(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到菲律宾语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="fil",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_burmese", response_model=TranslationResponse)
-async def translate_to_burmese(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到缅甸语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="bur",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_khmer", response_model=TranslationResponse)
-async def translate_to_khmer(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到高棉语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="hkm",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_lao", response_model=TranslationResponse)
-async def translate_to_lao(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到老挝语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="lao",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
-
-
-@router.post("/translate_to_tamil", response_model=TranslationResponse)
-async def translate_to_tamil(
-    request: SingleTargetRequest,
-    merger: RequestMerger = Depends(get_merger_dependency)
-):
-    """翻译到泰米尔语"""
-    try:
-        result = await merger.submit_request(
-            text=request.text,
-            from_lang="zh",
-            to_lang="tam",
-            font_size=request.font_size
-        )
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"翻译失败: {str(e)}")
+# 动态注册单一目标语言翻译接口
+# 所有接口都通过配置文件自动生成，避免重复代码
+register_single_target_routes(router)

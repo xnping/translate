@@ -15,6 +15,7 @@ from app.core.dependencies import get_cache, get_translator, get_request_merger,
 from app.api.translation import router as translation_router
 from app.api.batch import router as batch_router
 from app.api.system import router as system_router
+from app.api.frontend_config import router as frontend_config_router
 
 
 @asynccontextmanager
@@ -54,6 +55,7 @@ app = FastAPI(
 app.include_router(translation_router, prefix="/api", tags=["翻译"])
 app.include_router(batch_router, prefix="/api", tags=["批量翻译"])
 app.include_router(system_router, prefix="/api", tags=["系统"])
+app.include_router(frontend_config_router, prefix="/api", tags=["前端配置"])
 
 # 静态文件服务
 app.mount("/static", StaticFiles(directory="static"), name="static")

@@ -3,7 +3,11 @@
 """
 
 from typing import List, Optional, Union, Any
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+try:
+    from pydantic import validator
+except ImportError:
+    from pydantic import field_validator as validator
 
 
 class TranslationRequest(BaseModel):
