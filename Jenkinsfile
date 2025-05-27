@@ -13,16 +13,21 @@ pipeline {
             steps {
                 echo '开始部署...'
 
-                sshagent(['production-server-key']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'production-server-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     sh '''
+                        # 设置SSH配置
+                        mkdir -p ~/.ssh
+                        cp $SSH_KEY ~/.ssh/deploy_key
+                        chmod 600 ~/.ssh/deploy_key
+
                         # 创建目录
-                        ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "mkdir -p $PROJECT_PATH"
+                        ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "mkdir -p $PROJECT_PATH"
 
                         # 上传文件
-                        scp -r . $DEPLOY_USER@$DEPLOY_HOST:$PROJECT_PATH/
+                        scp -i ~/.ssh/deploy_key -r . $DEPLOY_USER@$DEPLOY_HOST:$PROJECT_PATH/
 
                         # 安装依赖并启动
-                        ssh $DEPLOY_USER@$DEPLOY_HOST "
+                        ssh -i ~/.ssh/deploy_key $DEPLOY_USER@$DEPLOY_HOST "
                             cd $PROJECT_PATH
                             python3 -m venv venv || true
                             source venv/bin/activate
@@ -30,6 +35,9 @@ pipeline {
                             pkill -f 'python.*main.py' || true
                             nohup python main.py > app.log 2>&1 &
                         "
+
+                        # 清理SSH密钥
+                        rm -f ~/.ssh/deploy_key
                     '''
                 }
 
