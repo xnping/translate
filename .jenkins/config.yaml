@@ -1,0 +1,102 @@
+# Jenkins配置文件
+# 用于配置Jenkins Pipeline的参数
+
+# 项目基本信息
+project:
+  name: "translation-api"
+  description: "多语言翻译API服务"
+  repository: "https://github.com/your-username/translation-api.git"
+  
+# 部署环境配置
+environments:
+  production:
+    host: "8.138.177.105"
+    user: "root"
+    port: 22
+    deploy_path: "/home/translation-api"
+    service_name: "translation-api"
+    service_port: 9000
+    
+  staging:
+    host: "staging.example.com"
+    user: "deploy"
+    port: 22
+    deploy_path: "/home/staging/translation-api"
+    service_name: "translation-api-staging"
+    service_port: 9001
+
+# 构建配置
+build:
+  python_version: "3.13"
+  requirements_file: "requirements.txt"
+  
+  # 代码质量检查
+  quality_checks:
+    syntax_check: true
+    config_validation: true
+    security_scan: true
+    
+  # 测试配置
+  tests:
+    unit_tests: false  # 暂时禁用，因为还没有单元测试
+    integration_tests: false
+    api_tests: true
+    config_tests: true
+
+# 部署配置
+deployment:
+  strategy: "rolling"  # 滚动部署
+  backup:
+    enabled: true
+    retention_days: 7
+    max_backups: 5
+    
+  health_check:
+    enabled: true
+    endpoint: "/health"
+    timeout: 30
+    retries: 3
+    
+  rollback:
+    enabled: true
+    auto_rollback_on_failure: true
+
+# 通知配置
+notifications:
+  email:
+    enabled: false
+    recipients: []
+    
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#deployments"
+    
+  webhook:
+    enabled: false
+    url: ""
+
+# 安全配置
+security:
+  ssh_key_credential_id: "production-server-key"
+  env_files:
+    - ".env"
+  secrets:
+    - "REDIS_PASSWORD"
+    - "API_SECRET_KEY"
+
+# 监控配置
+monitoring:
+  health_check_url: "http://8.138.177.105/health"
+  api_test_url: "http://8.138.177.105/api/languages"
+  
+# 日志配置
+logging:
+  level: "INFO"
+  retention_days: 30
+  
+# 性能配置
+performance:
+  build_timeout: 600  # 10分钟
+  deploy_timeout: 300  # 5分钟
+  test_timeout: 180   # 3分钟
