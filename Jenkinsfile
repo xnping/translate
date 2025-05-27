@@ -1,33 +1,36 @@
 pipeline {
     agent any
-    
+
     environment {
         // 项目配置
         PROJECT_NAME = 'translation-api'
         DEPLOY_PORT = '9000'
         DEPLOY_USER = 'root'
         DEPLOY_HOST = '45.204.6.32'  // 您的生产服务器IP
-        
+
         // Python环境
         PYTHON_VERSION = '3.13'
         VENV_PATH = '/home/translation-api/venv'
         PROJECT_PATH = '/home/translation-api'
-        
+
         // 服务配置
         SERVICE_NAME = 'translation-api'
         NGINX_CONFIG = '/etc/nginx/sites-available/translation-api'
-        
+
         // 备份配置
         BACKUP_PATH = '/home/backups/translation-api'
         MAX_BACKUPS = '5'
+
+        // 确保PATH包含常用命令路径
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:${env.PATH}"
     }
-    
+
     stages {
         stage('🔍 Checkout') {
             steps {
                 echo '正在拉取代码...'
                 checkout scm
-                
+
                 script {
                     // 获取提交信息
                     env.GIT_COMMIT_MSG = sh(
@@ -39,12 +42,12 @@ pipeline {
                         returnStdout: true
                     ).trim()
                 }
-                
+
                 echo "提交信息: ${env.GIT_COMMIT_MSG}"
                 echo "构建时间: ${env.BUILD_TIME}"
             }
         }
-        
+
         stage('🧪 代码质量检查') {
             parallel {
                 stage('语法检查') {
@@ -57,7 +60,7 @@ pipeline {
                         '''
                     }
                 }
-                
+
                 stage('配置验证') {
                     steps {
                         echo '正在验证配置文件...'
@@ -67,17 +70,17 @@ pipeline {
                                 echo "❌ 缺少语言配置文件"
                                 exit 1
                             fi
-                            
+
                             if [ ! -f "requirements.txt" ]; then
                                 echo "❌ 缺少依赖文件"
                                 exit 1
                             fi
-                            
+
                             echo "✅ 配置文件检查通过"
                         '''
                     }
                 }
-                
+
                 stage('安全检查') {
                     steps {
                         echo '正在进行安全检查...'
@@ -86,7 +89,7 @@ pipeline {
                             if grep -r "password.*=" . --exclude-dir=.git --exclude="*.log" | grep -v ".env.example"; then
                                 echo "⚠️ 发现可能的敏感信息"
                             fi
-                            
+
                             # 检查.env文件是否在.gitignore中
                             if [ -f ".gitignore" ] && grep -q ".env" .gitignore; then
                                 echo "✅ .env文件已正确忽略"
@@ -98,7 +101,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('📦 构建测试环境') {
             steps {
                 echo '正在创建测试环境...'
@@ -106,31 +109,31 @@ pipeline {
                     # 创建临时虚拟环境
                     python3 -m venv test_venv
                     source test_venv/bin/activate
-                    
+
                     # 升级pip
                     pip install --upgrade pip
-                    
+
                     # 安装依赖
                     pip install -r requirements.txt
-                    
+
                     echo "✅ 测试环境创建成功"
                 '''
             }
         }
-        
+
         stage('🧪 运行测试') {
             steps {
                 echo '正在运行测试...'
                 sh '''
                     source test_venv/bin/activate
-                    
+
                     # 配置验证测试
                     if [ -f "scripts/config_manager.py" ]; then
                         echo "正在验证配置..."
                         python scripts/config_manager.py validate
                         echo "✅ 配置验证通过"
                     fi
-                    
+
                     # API健康检查测试（如果有测试脚本）
                     if [ -f "scripts/test_all_apis.py" ]; then
                         echo "正在运行API测试..."
@@ -149,7 +152,7 @@ pipeline {
             }
             steps {
                 echo '正在部署到生产环境...'
-                
+
                 script {
                     // 使用SSH部署
                     sshagent(['production-server-key']) {
@@ -172,7 +175,7 @@ if [ -d "$PROJECT_PATH" ]; then
     BACKUP_NAME="backup_$(date +%Y%m%d_%H%M%S)"
     tar -czf "$BACKUP_PATH/$BACKUP_NAME.tar.gz" -C "$PROJECT_PATH" . 2>/dev/null || true
     echo "✅ 备份创建完成: $BACKUP_NAME.tar.gz"
-    
+
     # 保留最近5个备份
     cd $BACKUP_PATH
     ls -t *.tar.gz | tail -n +6 | xargs -r rm -f
@@ -195,25 +198,25 @@ EOF
 
                             # 上传部署脚本
                             scp deploy_script.sh $DEPLOY_USER@$DEPLOY_HOST:/tmp/
-                            
+
                             # 上传项目文件
                             echo "📤 上传项目文件..."
                             scp -r . $DEPLOY_USER@$DEPLOY_HOST:/tmp/translation-api-new/
-                            
+
                             # 执行部署
                             ssh $DEPLOY_USER@$DEPLOY_HOST << 'ENDSSH'
                                 # 执行部署脚本
                                 chmod +x /tmp/deploy_script.sh
                                 /tmp/deploy_script.sh
-                                
+
                                 # 复制新文件
                                 echo "📁 复制项目文件..."
                                 cp -r /tmp/translation-api-new/* /home/translation-api/
-                                
+
                                 # 设置权限
                                 chown -R www-data:www-data /home/translation-api
                                 chmod -R 755 /home/translation-api
-                                
+
                                 # 创建虚拟环境
                                 echo "🐍 设置Python环境..."
                                 cd /home/translation-api
@@ -221,7 +224,7 @@ EOF
                                 source venv/bin/activate
                                 pip install --upgrade pip
                                 pip install -r requirements.txt
-                                
+
                                 echo "✅ 依赖安装完成"
 ENDSSH
                         '''
@@ -229,7 +232,7 @@ ENDSSH
                 }
             }
         }
-        
+
         stage('⚙️ 配置服务') {
             when {
                 anyOf {
@@ -239,7 +242,7 @@ ENDSSH
             }
             steps {
                 echo '正在配置系统服务...'
-                
+
                 sshagent(['production-server-key']) {
                     sh '''
                         ssh $DEPLOY_USER@$DEPLOY_HOST << 'ENDSSH'
@@ -266,14 +269,14 @@ EOF
                             # 重新加载systemd
                             systemctl daemon-reload
                             systemctl enable translation-api
-                            
+
                             echo "✅ 服务配置完成"
 ENDSSH
                     '''
                 }
             }
         }
-        
+
         stage('🌐 配置Nginx') {
             when {
                 anyOf {
@@ -283,7 +286,7 @@ ENDSSH
             }
             steps {
                 echo '正在配置Nginx...'
-                
+
                 sshagent(['production-server-key']) {
                     sh '''
                         ssh $DEPLOY_USER@$DEPLOY_HOST << 'ENDSSH'
@@ -292,9 +295,9 @@ ENDSSH
 server {
     listen 80;
     server_name _;
-    
+
     client_max_body_size 10M;
-    
+
     # API代理
     location / {
         proxy_pass http://127.0.0.1:9000;
@@ -302,20 +305,20 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
+
         # 超时设置
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
     }
-    
+
     # 静态文件
     location /static/ {
         alias /home/translation-api/static/;
         expires 1d;
         add_header Cache-Control "public";
     }
-    
+
     # 健康检查
     location /health {
         proxy_pass http://127.0.0.1:9000/health;
@@ -326,20 +329,20 @@ EOF
 
                             # 启用站点
                             ln -sf /etc/nginx/sites-available/translation-api /etc/nginx/sites-enabled/
-                            
+
                             # 测试Nginx配置
                             nginx -t
-                            
+
                             # 重新加载Nginx
                             systemctl reload nginx
-                            
+
                             echo "✅ Nginx配置完成"
 ENDSSH
                     '''
                 }
             }
         }
-        
+
         stage('🔄 启动服务') {
             when {
                 anyOf {
@@ -349,16 +352,16 @@ ENDSSH
             }
             steps {
                 echo '正在启动服务...'
-                
+
                 sshagent(['production-server-key']) {
                     sh '''
                         ssh $DEPLOY_USER@$DEPLOY_HOST << 'ENDSSH'
                             # 启动服务
                             systemctl start translation-api
-                            
+
                             # 等待服务启动
                             sleep 5
-                            
+
                             # 检查服务状态
                             if systemctl is-active --quiet translation-api; then
                                 echo "✅ 服务启动成功"
@@ -372,7 +375,7 @@ ENDSSH
                 }
             }
         }
-        
+
         stage('🧪 部署验证') {
             when {
                 anyOf {
@@ -382,26 +385,26 @@ ENDSSH
             }
             steps {
                 echo '正在验证部署...'
-                
+
                 script {
                     // 健康检查
                     def healthCheck = sh(
                         script: "curl -f http://${DEPLOY_HOST}/health",
                         returnStatus: true
                     )
-                    
+
                     if (healthCheck == 0) {
                         echo "✅ 健康检查通过"
                     } else {
                         error "❌ 健康检查失败"
                     }
-                    
+
                     // API测试
                     def apiTest = sh(
                         script: "curl -f http://${DEPLOY_HOST}/api/languages",
                         returnStatus: true
                     )
-                    
+
                     if (apiTest == 0) {
                         echo "✅ API测试通过"
                     } else {
@@ -411,7 +414,7 @@ ENDSSH
             }
         }
     }
-    
+
     post {
         always {
             echo '清理临时文件...'
@@ -420,10 +423,10 @@ ENDSSH
                 rm -f deploy_script.sh 2>/dev/null || true
             '''
         }
-        
+
         success {
             echo '🎉 部署成功！'
-            
+
             script {
                 // 发送成功通知（可选）
                 def message = """
@@ -441,14 +444,14 @@ ENDSSH
 • API文档: http://${DEPLOY_HOST}/docs
 • 健康检查: http://${DEPLOY_HOST}/health
                 """
-                
+
                 echo message
             }
         }
-        
+
         failure {
             echo '❌ 部署失败！'
-            
+
             script {
                 def message = """
 ❌ 翻译API部署失败！
@@ -461,7 +464,7 @@ ENDSSH
 
 请检查Jenkins日志获取详细信息。
                 """
-                
+
                 echo message
             }
         }
