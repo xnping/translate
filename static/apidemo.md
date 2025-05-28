@@ -4,7 +4,7 @@
 
 本API提供多语言翻译服务，支持中文与东盟十国官方语言的双向翻译。
 
-**服务器地址**: `http://8.138.177.105`
+**服务器地址**: `http://45.204.6.32:9000`
 **支持格式**: JSON
 **字符编码**: UTF-8
 
@@ -17,19 +17,19 @@
 
 #### cURL 示例
 ```bash
-curl -X GET "http://8.138.177.105/health"
+curl -X GET "http://45.204.6.32:9000/health"
 ```
 
 #### JavaScript 示例
 ```javascript
 // 使用 fetch
-fetch('http://8.138.177.105/health')
+fetch('http://45.204.6.32:9000/health')
   .then(response => response.json())
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));
 
 // 使用 axios
-axios.get('http://8.138.177.105/health')
+axios.get('http://45.204.6.32:9000/health')
   .then(response => console.log(response.data))
   .catch(error => console.error('Error:', error));
 ```
@@ -43,7 +43,7 @@ interface HealthResponse {
 }
 
 async function checkHealth(): Promise<HealthResponse> {
-  const response = await fetch('http://8.138.177.105/health');
+  const response = await fetch('http://45.204.6.32:9000/health');
   return await response.json();
 }
 
@@ -61,7 +61,7 @@ checkHealth().then(data => {
 
 #### cURL 示例
 ```bash
-curl -X GET "http://8.138.177.105/api/languages"
+curl -X GET "http://45.204.6.32:9000/api/languages"
 ```
 
 #### JavaScript 示例
@@ -69,7 +69,7 @@ curl -X GET "http://8.138.177.105/api/languages"
 // 获取语言列表
 async function getLanguages() {
   try {
-    const response = await fetch('http://8.138.177.105/api/languages');
+    const response = await fetch('http://45.204.6.32:9000/api/languages');
     const languages = await response.json();
 
     // 显示支持的语言
@@ -91,7 +91,7 @@ interface Languages {
 }
 
 async function getLanguages(): Promise<Languages> {
-  const response = await fetch('http://8.138.177.105/api/languages');
+  const response = await fetch('http://45.204.6.32:9000/api/languages');
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -122,7 +122,7 @@ getLanguages().then(languages => {
 #### cURL 示例
 ```bash
 # 中文翻译为英文
-curl -X POST "http://8.138.177.105/api/translate" \
+curl -X POST "http://45.204.6.32:9000/api/translate" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "你好世界",
@@ -132,7 +132,7 @@ curl -X POST "http://8.138.177.105/api/translate" \
   }'
 
 # 自动检测语言翻译为中文
-curl -X POST "http://8.138.177.105/api/translate" \
+curl -X POST "http://45.204.6.32:9000/api/translate" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "Hello World",
@@ -156,7 +156,7 @@ async function translateText(text, fromLang = 'auto', toLang = 'zh', fontSize = 
   }
 
   try {
-    const response = await fetch('http://8.138.177.105/api/translate', {
+    const response = await fetch('http://45.204.6.32:9000/api/translate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -232,7 +232,7 @@ type TranslationResult = TranslationSuccess | TranslationError;
 class TranslationAPI {
   private baseUrl: string;
 
-  constructor(baseUrl: string = 'http://8.138.177.105') {
+  constructor(baseUrl: string = 'http://45.204.6.32:9000') {
     this.baseUrl = baseUrl;
   }
 
@@ -329,7 +329,7 @@ api.translate('你好世界', 'zh', 'en', '24px')
 #### cURL 示例
 ```bash
 # 翻译到英语
-curl -X POST "http://8.138.177.105/api/translate_to_english" \
+curl -X POST "http://45.204.6.32:9000/api/translate_to_english" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "你好世界",
@@ -337,7 +337,7 @@ curl -X POST "http://8.138.177.105/api/translate_to_english" \
   }'
 
 # 翻译到泰语
-curl -X POST "http://8.138.177.105/api/translate_to_thai" \
+curl -X POST "http://45.204.6.32:9000/api/translate_to_thai" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "早上好",
@@ -345,7 +345,7 @@ curl -X POST "http://8.138.177.105/api/translate_to_thai" \
   }'
 
 # 翻译到越南语
-curl -X POST "http://8.138.177.105/api/translate_to_vietnamese" \
+curl -X POST "http://45.204.6.32:9000/api/translate_to_vietnamese" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "谢谢"
@@ -356,7 +356,7 @@ curl -X POST "http://8.138.177.105/api/translate_to_vietnamese" \
 ```javascript
 // 单一目标语言翻译类
 class SingleTargetTranslator {
-  constructor(baseUrl = 'http://8.138.177.105') {
+  constructor(baseUrl = 'http://45.204.6.32:9000') {
     this.baseUrl = baseUrl;
   }
 
@@ -493,7 +493,7 @@ type SupportedLanguage =
 class SingleTargetTranslator {
   private baseUrl: string;
 
-  constructor(baseUrl: string = 'http://8.138.177.105') {
+  constructor(baseUrl: string = 'http://45.204.6.32:9000') {
     this.baseUrl = baseUrl;
   }
 
@@ -615,7 +615,7 @@ batchTranslateExample();
 #### cURL 示例
 ```bash
 # 批量翻译到英语
-curl -X POST "http://8.138.177.105/api/batch/translate_to_english" \
+curl -X POST "http://45.204.6.32:9000/api/batch/translate_to_english" \
   -H "Content-Type: application/json" \
   -d '{
     "items": [
@@ -637,7 +637,7 @@ async function batchTranslateTo(language, items, fontSize = null) {
   }
 
   try {
-    const response = await fetch(`http://8.138.177.105/api/batch/translate_to_${language}`, {
+    const response = await fetch(`http://45.204.6.32:9000/api/batch/translate_to_${language}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -681,7 +681,7 @@ batchTranslateTo('english', items, '18px')
 
 #### cURL 示例
 ```bash
-curl -X GET "http://8.138.177.105/api/performance_stats"
+curl -X GET "http://45.204.6.32:9000/api/performance_stats"
 ```
 
 #### JavaScript 示例
@@ -689,7 +689,7 @@ curl -X GET "http://8.138.177.105/api/performance_stats"
 // 获取性能统计
 async function getPerformanceStats() {
   try {
-    const response = await fetch('http://8.138.177.105/api/performance_stats');
+    const response = await fetch('http://45.204.6.32:9000/api/performance_stats');
     const stats = await response.json();
 
     console.log('性能统计:', stats);
@@ -723,7 +723,7 @@ interface PerformanceStats {
 
 async function getPerformanceStats(): Promise<PerformanceStats | null> {
   try {
-    const response = await fetch('http://8.138.177.105/api/performance_stats');
+    const response = await fetch('http://45.204.6.32:9000/api/performance_stats');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -776,7 +776,7 @@ monitor.start(30000); // 每30秒监控一次
 
 #### cURL 示例
 ```bash
-curl -X GET "http://8.138.177.105/api/cache_info"
+curl -X GET "http://45.204.6.32:9000/api/cache_info"
 ```
 
 #### JavaScript 示例
@@ -784,7 +784,7 @@ curl -X GET "http://8.138.177.105/api/cache_info"
 // 获取缓存信息
 async function getCacheInfo() {
   try {
-    const response = await fetch('http://8.138.177.105/api/cache_info');
+    const response = await fetch('http://45.204.6.32:9000/api/cache_info');
     const cacheInfo = await response.json();
 
     console.log('缓存信息:', cacheInfo);
@@ -860,7 +860,7 @@ async function apiRequest(url, options = {}) {
 
 // 使用示例
 async function safeTranslate(text, fromLang, toLang) {
-  const result = await apiRequest('http://8.138.177.105/api/translate', {
+  const result = await apiRequest('http://45.204.6.32:9000/api/translate', {
     method: 'POST',
     body: JSON.stringify({
       text,
@@ -897,7 +897,7 @@ type ApiResult<T> = ApiResponse<T> | ApiError;
 class TranslationAPIClient {
   private baseUrl: string;
 
-  constructor(baseUrl: string = 'http://8.138.177.105') {
+  constructor(baseUrl: string = 'http://45.204.6.32:9000') {
     this.baseUrl = baseUrl;
   }
 
@@ -1010,7 +1010,7 @@ const throttler = new RequestThrottler(5); // 每秒最多5个请求
 
 async function throttledTranslate(text) {
   return throttler.throttle(() =>
-    fetch('http://8.138.177.105/api/translate', {
+    fetch('http://45.204.6.32:9000/api/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, from_lang: 'zh', to_lang: 'en' })
@@ -1059,7 +1059,7 @@ class BatchRequestManager {
           id: `batch_${index}`
         }));
 
-        const response = await fetch('http://8.138.177.105/api/batch/translate', {
+        const response = await fetch('http://45.204.6.32:9000/api/batch/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1129,7 +1129,7 @@ interface TranslationState {
 
 export function useTranslation(options: UseTranslationOptions = {}) {
   const {
-    baseUrl = 'http://8.138.177.105',
+    baseUrl = 'http://45.204.6.32:9000',
     defaultFromLang = 'zh',
     defaultToLang = 'en'
   } = options;
