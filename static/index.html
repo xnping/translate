@@ -266,13 +266,8 @@
     <div class="header">
         <h1>🌐 翻译API接口文档</h1>
         <p>多语言翻译服务 - 支持中文与东盟十国官方语言的双向翻译</p>
-    </div>
-
-    <div class="language-switch">
-        <select id="languageSelect">
-            <option value="zh">中文</option>
-            <option value="en">English</option>
-        </select>
+<!--        <p href="../static/demo.html">这是可以测试翻译的demo测试页面和具体的源码效果</p>-->
+        <p><a href="../static/demo.html">点击我 👆 这是测试翻译效果的demo测试页面和具体的源码效果</a></p>
     </div>
 
     <div class="container">
@@ -805,15 +800,6 @@
                 button.textContent = '测试接口';
             }
         }
-
-        // 语言切换功能
-        document.getElementById('languageSelect').addEventListener('change', function(e) {
-            const lang = e.target.value;
-            // 这里可以添加多语言切换逻辑
-            console.log('切换语言到:', lang);
-        });
-
-        // 页面加载完成后执行
         document.addEventListener('DOMContentLoaded', loadMarkdown);
     </script>
 </body>
