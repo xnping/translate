@@ -77,4 +77,9 @@ async def news_page():
     """新闻页面"""
     return FileResponse("static/news-page.html")
 
+@app.get("/index")
+async def index_page():
+    """大型HTML测试页面 - 27万字符"""
+    return FileResponse("static/index.html")
+
 

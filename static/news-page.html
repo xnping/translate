@@ -471,19 +471,46 @@
 
                 console.log('后端返回的结果：', result);
 
-                // 如果翻译成功，替换页面内容
-                if (result.success && result.data.ultimate_replacement_results) {
-                    const translatedHtml = result.data.ultimate_replacement_results.translated_html_body;
-                    const stats = result.data.ultimate_replacement_results.replacement_statistics;
+                // 处理翻译结果
+                let translatedHtml, stats, processingMode;
+
+                // 检查是大型HTML还是标准HTML处理结果
+                if (result.data.large_html_results) {
+                    // 大型HTML处理结果
+                    translatedHtml = result.data.large_html_results.translated_html_body;
+                    stats = result.data.large_html_results.processing_statistics;
+                    processingMode = "大型HTML";
+                } else if (result.data.ultimate_replacement_results) {
+                    // 标准HTML处理结果
+                    translatedHtml = result.data.ultimate_replacement_results.translated_html_body;
+                    stats = result.data.ultimate_replacement_results.replacement_statistics;
+                    processingMode = "标准";
+                }
+
+                if (translatedHtml && stats) {
+                    // 构建确认消息
+                    let confirmMessage = `🎉 ${processingMode}翻译完成！\n`;
+
+                    if (stats.processing_time) {
+                        confirmMessage += `处理耗时: ${stats.processing_time}秒\n`;
+                    }
+                    if (stats.chunks_processed) {
+                        confirmMessage += `处理块数: ${stats.chunks_processed}\n`;
+                    }
+
+                    confirmMessage += `替换率: ${stats.replacement_rate.toFixed(2)}%\n`;
+
+                    if (stats.replaced_count !== undefined) {
+                        confirmMessage += `已替换 ${stats.replaced_count} 个中文字符\n`;
+                    }
+                    if (stats.remaining_chinese_count !== undefined) {
+                        confirmMessage += `剩余 ${stats.remaining_chinese_count} 个中文字符\n`;
+                    }
+
+                    confirmMessage += `\n是否要应用翻译到当前页面？`;
 
                     // 询问用户是否要应用翻译
-                    const applyTranslation = confirm(
-                        `🎉 终极翻译完成！\n` +
-                        `替换率: ${stats.replacement_rate.toFixed(2)}%\n` +
-                        `已替换 ${stats.replaced_count} 个中文字符\n` +
-                        `剩余 ${stats.remaining_chinese_count} 个中文字符\n\n` +
-                        `是否要应用翻译到当前页面？`
-                    );
+                    const applyTranslation = confirm(confirmMessage);
 
                     if (applyTranslation) {
                         // 替换页面body内容
@@ -492,10 +519,10 @@
                         // 更新状态消息
                         const newStatusDiv = document.getElementById('statusMessage');
                         if (newStatusDiv) {
-                            newStatusDiv.textContent = `🎉 翻译已应用！替换率: ${stats.replacement_rate.toFixed(2)}%`;
+                            newStatusDiv.textContent = `🎉 ${processingMode}翻译已应用！替换率: ${stats.replacement_rate.toFixed(2)}%`;
                         }
 
-                        console.log('🎉 翻译已应用！', stats);
+                        console.log(`🎉 ${processingMode}翻译已应用！`, stats);
                     }
                 }
 

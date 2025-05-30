@@ -12,6 +12,7 @@ python-dotenv
 PyYAML
 beautifulsoup4
 lxml
+aiohttp
 
 # Redis缓存 (可选)
 redis
