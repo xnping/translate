@@ -65,10 +65,10 @@ class Settings(BaseSettings):
 
     # ===== MySQL数据库配置 =====
     db_username: str = "root"
-    db_password: str = ""
-    db_host: str = "localhost"
+    db_password: str = "123456"
+    db_host: str = "8.138.177.105"
     db_port: int = 3306
-    db_name: str = "translation_db"
+    db_name: str = "baidu"
 
     # ===== JWT认证配置 =====
     jwt_secret: str = "default-jwt-secret"

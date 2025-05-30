@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>敏感词管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+
+
+        .batch-actions {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .checkbox {
+            margin-right: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ 敏感词管理系统</h1>
+            <p>高效管理和检测敏感词内容</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 统计信息 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalWords">-</div>
+                    <div class="stat-label">总敏感词数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="todayAdded">-</div>
+                    <div class="stat-label">今日新增</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="lastUpdate">-</div>
+                    <div class="stat-label">最近更新</div>
+                </div>
+            </div>
+
+            <!-- 消息提示 -->
+            <div id="alertContainer"></div>
+
+            <!-- 添加敏感词 -->
+            <div class="section">
+                <h2>➕ 添加敏感词</h2>
+                <div class="form-group">
+                    <label for="newWord">敏感词内容：</label>
+                    <input type="text" id="newWord" class="form-control" placeholder="请输入敏感词内容">
+                </div>
+                <button class="btn btn-primary" onclick="addWord()">添加敏感词</button>
+                <button class="btn btn-success" onclick="showBatchAddModal()">批量添加</button>
+            </div>
+
+
+
+            <!-- 敏感词列表 -->
+            <div class="section">
+                <h2>📋 敏感词列表</h2>
+                
+                <!-- 批量操作 -->
+
+                <div class="batch-actions">
+                    <input type="checkbox" id="selectAll" class="checkbox" onchange="toggleSelectAll()">
+                    <label for="selectAll">全选</label>
+                    <button class="btn btn-danger" onclick="batchDeleteWords()">批量删除</button>
+                    <span id="selectedCount">已选择: 0 项</span>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th width="50">选择</th>
+                                <th width="80">ID</th>
+                                <th>敏感词内容</th>
+                                <th width="200">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wordsTableBody">
+                            <tr>
+                                <td colspan="4" class="loading">正在加载数据...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页 -->
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量添加模态框 -->
+    <div id="batchAddModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
+            <h3 style="margin-bottom: 20px;">批量添加敏感词</h3>
+            <div class="form-group">
+                <label for="batchWords">敏感词列表（每行一个）：</label>
+                <textarea id="batchWords" class="form-control" rows="8" placeholder="请输入敏感词，每行一个"></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn btn-primary" onclick="batchAddWords()">确认添加</button>
+                <button class="btn" onclick="closeBatchAddModal()" style="background: #ccc;">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalPages = 1;
+        let selectedWords = new Set();
+
+        // API基础URL
+        const API_BASE = '/api/words';
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadWords();
+
+
+
+            // 新增敏感词回车事件
+            document.getElementById('newWord').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addWord();
+                }
+            });
+        });
+
+        // 显示消息提示
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+
+            // 3秒后自动消失
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // 加载统计信息
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats/summary`);
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('totalWords').textContent = result.data.total_words;
+                    document.getElementById('todayAdded').textContent = '0'; // 可以后续添加
+                    document.getElementById('lastUpdate').textContent = '刚刚';
+                }
+            } catch (error) {
+                console.error('加载统计信息失败:', error);
+            }
+        }
+
+        // 加载敏感词列表
+        async function loadWords(page = 1) {
+            try {
+                currentPage = page;
+                const url = `${API_BASE}/?page=${page}&page_size=${pageSize}`;
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayWords(result.data);
+                    updatePagination(result.total, result.page, result.page_size);
+                    loadStats(); // 更新统计
+                } else {
+                    showAlert('加载敏感词列表失败', 'error');
+                }
+            } catch (error) {
+                console.error('加载敏感词列表失败:', error);
+                showAlert('网络错误，请检查连接', 'error');
+            }
+        }
+
+        // 显示敏感词列表
+        function displayWords(words) {
+            const tbody = document.getElementById('wordsTableBody');
+
+            if (words.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">暂无数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = words.map(word => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="word-checkbox" value="${word.id}" onchange="updateSelectedCount()">
+                    </td>
+                    <td>${word.id}</td>
+                    <td>
+                        <span id="word-${word.id}">${escapeHtml(word.words)}</span>
+                        <input type="text" id="edit-${word.id}" value="${escapeHtml(word.words)}" class="form-control hidden">
+                    </td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editWord(${word.id})" id="edit-btn-${word.id}">编辑</button>
+                        <button class="btn btn-success hidden" onclick="saveWord(${word.id})" id="save-btn-${word.id}">保存</button>
+                        <button class="btn" onclick="cancelEdit(${word.id})" id="cancel-btn-${word.id}" style="background: #ccc; display: none;">取消</button>
+                        <button class="btn btn-danger" onclick="deleteWord(${word.id})">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // 重置选择状态
+            selectedWords.clear();
+            document.getElementById('selectAll').checked = false;
+            updateSelectedCount();
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 更新分页
+        function updatePagination(total, page, pageSize) {
+            totalPages = Math.ceil(total / pageSize);
+            const pagination = document.getElementById('pagination');
+
+            let paginationHtml = '';
+
+            // 上一页
+            if (page > 1) {
+                paginationHtml += `<button class="page-btn" onclick="loadWords(${page - 1})">上一页</button>`;
+            }
+
+            // 页码
+            for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) {
+                paginationHtml += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="loadWords(${i})">${i}</button>`;
+            }
+
+            // 下一页
+            if (page < totalPages) {
+                paginationHtml += `<button class="page-btn" onclick="loadWords(${page + 1})">下一页</button>`;
+            }
+
+            pagination.innerHTML = paginationHtml;
+        }
+
+
+
+        // 添加敏感词
+        async function addWord() {
+            const wordInput = document.getElementById('newWord');
+            const word = wordInput.value.trim();
+
+            if (!word) {
+                showAlert('请输入敏感词内容', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE + '/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ words: word })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        showAlert('敏感词添加成功', 'success');
+                        wordInput.value = '';
+                        loadWords(currentPage);
+                    } else {
+                        showAlert(result.message || '添加失败', 'error');
+                    }
+                } else {
+                    // 处理HTTP错误状态
+                    const errorData = await response.json();
+                    showAlert(errorData.detail || `添加失败 (${response.status})`, 'error');
+                }
+            } catch (error) {
+                console.error('添加敏感词失败:', error);
+                showAlert('网络错误，请重试', 'error');
+            }
+        }
+
+        // 编辑敏感词
+        function editWord(id) {
+            document.getElementById(`word-${id}`).classList.add('hidden');
+            document.getElementById(`edit-${id}`).classList.remove('hidden');
+            document.getElementById(`edit-btn-${id}`).classList.add('hidden');
+            document.getElementById(`save-btn-${id}`).classList.remove('hidden');
+            document.getElementById(`cancel-btn-${id}`).style.display = 'inline-block';
+        }
+
+        // 取消编辑
+        function cancelEdit(id) {
+            document.getElementById(`word-${id}`).classList.remove('hidden');
+            document.getElementById(`edit-${id}`).classList.add('hidden');
+            document.getElementById(`edit-btn-${id}`).classList.remove('hidden');
+            document.getElementById(`save-btn-${id}`).classList.add('hidden');
+            document.getElementById(`cancel-btn-${id}`).style.display = 'none';
+        }
+
+        // 保存敏感词
+        async function saveWord(id) {
+            const newWord = document.getElementById(`edit-${id}`).value.trim();
+
+            if (!newWord) {
+                showAlert('敏感词内容不能为空', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ words: newWord })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        showAlert('敏感词更新成功', 'success');
+                        loadWords(currentPage);
+                    } else {
+                        showAlert(result.message || '更新失败', 'error');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.detail || `更新失败 (${response.status})`, 'error');
+                }
+            } catch (error) {
+                console.error('更新敏感词失败:', error);
+                showAlert('网络错误，请重试', 'error');
+            }
+        }
+
+        // 删除敏感词
+        async function deleteWord(id) {
+            if (!confirm('确定要删除这个敏感词吗？')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        showAlert('敏感词删除成功', 'success');
+                        loadWords(currentPage);
+                    } else {
+                        showAlert(result.message || '删除失败', 'error');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.detail || `删除失败 (${response.status})`, 'error');
+                }
+            } catch (error) {
+                console.error('删除敏感词失败:', error);
+                showAlert('网络错误，请重试', 'error');
+            }
+        }
+
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.word-checkbox');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+                if (selectAll.checked) {
+                    selectedWords.add(parseInt(checkbox.value));
+                } else {
+                    selectedWords.delete(parseInt(checkbox.value));
+                }
+            });
+
+            updateSelectedCount();
+        }
+
+        // 更新选中数量
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.word-checkbox:checked');
+            selectedWords.clear();
+
+            checkboxes.forEach(checkbox => {
+                selectedWords.add(parseInt(checkbox.value));
+            });
+
+            document.getElementById('selectedCount').textContent = `已选择: ${selectedWords.size} 项`;
+
+            // 更新全选状态
+            const allCheckboxes = document.querySelectorAll('.word-checkbox');
+            const selectAll = document.getElementById('selectAll');
+            selectAll.checked = allCheckboxes.length > 0 && checkboxes.length === allCheckboxes.length;
+        }
+
+        // 批量删除
+        async function batchDeleteWords() {
+            if (selectedWords.size === 0) {
+                showAlert('请先选择要删除的敏感词', 'error');
+                return;
+            }
+
+            if (!confirm(`确定要删除选中的 ${selectedWords.size} 个敏感词吗？`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/batch/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ word_ids: Array.from(selectedWords) })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        showAlert(`批量删除完成: 成功${result.data.success_count}个，失败${result.data.failed_count}个`, 'success');
+                        loadWords(currentPage);
+                    } else {
+                        showAlert('批量删除失败', 'error');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    showAlert(errorData.detail || `批量删除失败 (${response.status})`, 'error');
+                }
+            } catch (error) {
+                console.error('批量删除失败:', error);
+                showAlert('网络错误，请重试', 'error');
+            }
+        }
+
+        // 显示批量添加模态框
+        function showBatchAddModal() {
+            document.getElementById('batchAddModal').style.display = 'flex';
+        }
+
+        // 关闭批量添加模态框
+        function closeBatchAddModal() {
+            document.getElementById('batchAddModal').style.display = 'none';
+            document.getElementById('batchWords').value = '';
+        }
+
+        // 批量添加敏感词
+        async function batchAddWords() {
+            const batchText = document.getElementById('batchWords').value.trim();
+
+            if (!batchText) {
+                showAlert('请输入敏感词内容', 'error');
+                return;
+            }
+
+            const wordsList = batchText.split('\n').map(word => word.trim()).filter(word => word);
+
+            if (wordsList.length === 0) {
+                showAlert('请输入有效的敏感词内容', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/batch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ words_list: wordsList })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`批量添加完成: 成功${result.data.success_count}个，失败${result.data.failed_count}个`, 'success');
+                    closeBatchAddModal();
+                    loadWords(currentPage);
+                } else {
+                    showAlert('批量添加失败', 'error');
+                }
+            } catch (error) {
+                console.error('批量添加失败:', error);
+                showAlert('网络错误，请重试', 'error');
+            }
+        }
+
+        // 点击模态框外部关闭
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('batchAddModal');
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeBatchAddModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

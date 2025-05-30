@@ -10,7 +10,9 @@ from fastapi.responses import FileResponse
 
 from app.config.config import init_database, close_database, get_settings
 from app.api.translation import router as translation_router
+from app.api.words import router as words_router
 from app.services.redis_path_cache_service import redis_path_cache_service
+from app.services.mysql_service import mysql_service
 
 
 @asynccontextmanager
@@ -45,6 +47,16 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"❌ Redis路径缓存初始化异常: {e}")
 
+    # 初始化MySQL连接池
+    try:
+        mysql_success = await mysql_service.create_pool()
+        if mysql_success:
+            print("✅ MySQL连接池初始化成功")
+        else:
+            print("❌ MySQL连接池初始化失败")
+    except Exception as e:
+        print(f"❌ MySQL连接池初始化异常: {e}")
+
     print("服务启动完成！")
 
     yield
@@ -63,6 +75,12 @@ async def lifespan(app: FastAPI):
         print("✅ Redis路径缓存连接已关闭")
     except Exception as e:
         print(f"⚠️ Redis路径缓存连接关闭失败: {e}")
+
+    try:
+        await mysql_service.close_pool()
+        print("✅ MySQL连接池已关闭")
+    except Exception as e:
+        print(f"⚠️ MySQL连接池关闭失败: {e}")
 
     print("服务已关闭")
 
@@ -91,6 +109,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 注册路由
 app.include_router(translation_router)
+app.include_router(words_router)
 
 
 @app.get("/")
@@ -100,11 +119,19 @@ async def root():
         "message": "高速并发翻译API",
         "version": "2.0.0",
         "docs": "/docs",
+        "admin": "/admin",
         "endpoints": {
             "translate": "/api/translate",
+            "words": "/api/words",
             "redis_status": "/redis/status"
         }
     }
+
+
+@app.get("/admin")
+async def admin_page():
+    """管理页面"""
+    return FileResponse("static/admin/index.html")
 
 
 
