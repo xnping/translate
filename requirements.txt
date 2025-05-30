@@ -13,6 +13,7 @@ PyYAML
 beautifulsoup4
 lxml
 aiohttp
+redis[hiredis]
 
 # Redis缓存 (可选)
 redis

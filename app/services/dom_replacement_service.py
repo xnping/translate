@@ -87,7 +87,7 @@ class DomReplacementService:
             }
         }
         
-        print(f"✅ DOM提取完成: {len(text_nodes)} 个文本节点, {len(chinese_texts)} 个中文片段")
+        print(f" DOM提取完成: {len(text_nodes)} 个文本节点, {len(chinese_texts)} 个中文片段")
         return result
     
     def replace_chinese_in_dom(self, dom_data: Dict, translation_map: Dict[str, str]) -> str:
@@ -101,7 +101,7 @@ class DomReplacementService:
         Returns:
             替换后的HTML字符串
         """
-        print("🔄 开始DOM精确替换...")
+        print("开始DOM精确替换...")
         
         soup = dom_data['soup']
         text_nodes = dom_data['text_nodes']

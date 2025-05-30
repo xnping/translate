@@ -1,5 +1,5 @@
 """
-大型HTML处理服务 - 专门处理20万字符以上的HTML
+专门处理20万字符以上的HTML
 """
 
 import re
@@ -11,7 +11,6 @@ import gc
 
 
 class LargeHtmlProcessor:
-    """大型HTML处理器"""
     
     def __init__(self):
         """初始化大型HTML处理器"""
@@ -23,10 +22,8 @@ class LargeHtmlProcessor:
     def estimate_processing_time(self, html_length: int) -> Dict:
         """
         估算处理时间
-        
         Args:
             html_length: HTML长度
-            
         Returns:
             处理时间估算
         """
@@ -54,14 +51,12 @@ class LargeHtmlProcessor:
     def split_html_into_chunks(self, html_content: str) -> List[Dict]:
         """
         将大型HTML分割成可处理的块
-        
         Args:
             html_content: HTML内容
-            
         Returns:
             HTML块列表
         """
-        print(f"📦 开始分割HTML ({len(html_content)} 字符)...")
+        print(f" 开始分割HTML ({len(html_content)} 字符)...")
         
         chunks = []
         current_pos = 0
@@ -90,16 +85,14 @@ class LargeHtmlProcessor:
             current_pos = chunk_end
             chunk_index += 1
         
-        print(f"📦 HTML分割完成: {len(chunks)} 个块")
+        print(f" HTML分割完成: {len(chunks)} 个块")
         return chunks
     
     def extract_chinese_from_chunk(self, chunk: Dict) -> Dict:
         """
         从HTML块中提取中文文本
-        
         Args:
             chunk: HTML块
-            
         Returns:
             提取结果
         """
@@ -163,7 +156,7 @@ class LargeHtmlProcessor:
             return result
             
         except Exception as e:
-            print(f"❌ 块 {chunk['index']} 解析失败: {str(e)}")
+            print(f" 块 {chunk['index']} 解析失败: {str(e)}")
             return {
                 "chunk_index": chunk["index"],
                 "error": str(e),
@@ -175,7 +168,6 @@ class LargeHtmlProcessor:
     def batch_texts_for_translation(self, all_chinese_texts: List[str]) -> List[List[str]]:
         """
         将文本分批用于翻译
-        
         Args:
             all_chinese_texts: 所有中文文本
             
@@ -211,18 +203,16 @@ class LargeHtmlProcessor:
             else:
                 current_batch.append(text)
                 current_length += text_length
-        
         # 添加最后一批
         if current_batch:
             batches.append(current_batch)
         
-        print(f"📊 文本分批完成: {len(unique_texts)} 个唯一文本分为 {len(batches)} 批")
+        print(f" 文本分批完成: {len(unique_texts)} 个唯一文本分为 {len(batches)} 批")
         return batches
     
     async def process_large_html(self, html_content: str, translation_service, from_lang: str, to_lang: str) -> Tuple[str, Dict]:
         """
-        处理大型HTML的主要方法
-        
+        大型HTML的主要方法
         Args:
             html_content: HTML内容
             translation_service: 翻译服务
@@ -236,7 +226,7 @@ class LargeHtmlProcessor:
         
         # 1. 估算处理时间
         estimation = self.estimate_processing_time(len(html_content))
-        print("📊 大型HTML处理估算:")
+        print(" 大型HTML处理估算:")
         for key, value in estimation.items():
             print(f"  {key}: {value}")
         
@@ -244,7 +234,7 @@ class LargeHtmlProcessor:
         chunks = self.split_html_into_chunks(html_content)
         
         # 3. 并行提取中文文本
-        print("🔍 并行提取中文文本...")
+        print(" 并行提取中文文本...")
         chunk_results = []
         all_chinese_texts = []
         
@@ -257,7 +247,7 @@ class LargeHtmlProcessor:
             if len(chunk_results) % 5 == 0:
                 gc.collect()
         
-        print(f"✅ 文本提取完成: {len(all_chinese_texts)} 个中文片段")
+        print(f" 文本提取完成: {len(all_chinese_texts)} 个中文片段")
         
         # 4. 分批翻译
         text_batches = self.batch_texts_for_translation(all_chinese_texts)
@@ -274,7 +264,6 @@ class LargeHtmlProcessor:
         
         # 等待所有翻译完成
         batch_results = await asyncio.gather(*translation_tasks)
-        
         # 5. 合并翻译结果
         translation_map = {}
         total_success = 0
@@ -288,10 +277,10 @@ class LargeHtmlProcessor:
                 else:
                     total_failed += 1
         
-        print(f"✅ 翻译完成: 成功 {total_success}, 失败 {total_failed}")
+        print(f" 翻译完成: 成功 {total_success}, 失败 {total_failed}")
         
         # 6. 分块替换
-        print("🔄 开始分块替换...")
+        print(" 开始分块替换...")
         translated_chunks = []
         
         for i, (chunk, chunk_result) in enumerate(zip(chunks, chunk_results)):
@@ -334,7 +323,7 @@ class LargeHtmlProcessor:
             "memory_peak_mb": estimation["memory_usage_mb"]
         }
         
-        print(f"🎉 大型HTML处理完成! 耗时: {processing_time}秒")
+        print(f" HTML处理完成! 耗时: {processing_time}秒")
         
         return final_html, stats
     
@@ -506,50 +495,7 @@ class LargeHtmlProcessor:
 
         return updated_html
 
-    async def _retry_failed_translations(self, failed_texts: List[str], translation_service, from_lang: str, to_lang: str) -> List[Dict]:
-        """
-        重试翻译失败的文本，使用更宽松的策略
-        """
-        retry_results = []
 
-        for text in failed_texts[:20]:  # 只重试前20个
-            # 策略1: 清理文本后重试
-            cleaned_text = re.sub(r'[^\u4e00-\u9fff\w\s]', '', text).strip()
-            if cleaned_text and cleaned_text != text:
-                # 使用同步翻译方法
-                result = translation_service.translate_text(cleaned_text, from_lang, to_lang)
-                if result["success"]:
-                    retry_results.append({
-                        "success": True,
-                        "original": text,
-                        "translated": result["translated"]
-                    })
-                    continue
-
-            # 策略2: 如果是单个字符，使用字典翻译
-            if len(text) == 1:
-                simple_translations = {
-                    "的": "of", "了": "ed", "在": "in", "是": "is", "有": "have",
-                    "和": "and", "就": "just", "都": "all", "而": "and", "及": "and",
-                    "与": "with", "为": "for", "由": "by", "从": "from", "到": "to"
-                }
-                if text in simple_translations:
-                    retry_results.append({
-                        "success": True,
-                        "original": text,
-                        "translated": simple_translations[text]
-                    })
-                    continue
-
-            # 策略3: 如果是短文本，尝试拼音
-            if len(text) <= 3:
-                retry_results.append({
-                    "success": True,
-                    "original": text,
-                    "translated": f"[{text}]"  # 用方括号标记未翻译
-                })
-
-        return retry_results
 
     def _final_global_brute_force_replace(self, html_content: str, translation_map: Dict[str, str]) -> str:
         """
@@ -617,7 +563,6 @@ class LargeHtmlProcessor:
     async def process_large_html_with_ultimate_dom(self, html_content: str, dom_service, translation_service, from_lang: str, to_lang: str) -> Tuple[str, Dict]:
         """
         使用DOM服务的终极方法处理大型HTML - 100%提取和100%替换
-
         Args:
             html_content: HTML内容
             dom_service: DOM替换服务
@@ -630,11 +575,11 @@ class LargeHtmlProcessor:
         """
         start_time = time.time()
 
-        print("🚀 启动大型HTML终极DOM处理模式 - 100%提取和100%替换...")
+        print("启动大型HTML终极DOM处理模式 - 100%提取和100%替换...")
 
         # 1. 估算处理时间
         estimation = self.estimate_processing_time(len(html_content))
-        print("📊 大型HTML终极DOM处理估算:")
+        print(" 大型HTML终极DOM处理估算:")
         for key, value in estimation.items():
             print(f"  {key}: {value}")
 
@@ -642,7 +587,7 @@ class LargeHtmlProcessor:
         chunks = self.split_html_into_chunks(html_content)
 
         # 3. 对每个块使用DOM服务进行100%提取
-        print("🔍 使用DOM服务进行100%提取...")
+        print(" 使用DOM服务进行100%提取...")
         all_dom_data = []
         all_chinese_texts = []
 
@@ -664,7 +609,7 @@ class LargeHtmlProcessor:
             if (i + 1) % 3 == 0:
                 gc.collect()
 
-        print(f"✅ DOM提取完成: {len(all_chinese_texts)} 个中文片段")
+        print(f"DOM提取完成: {len(all_chinese_texts)} 个中文片段")
 
         # 4. 高速并发翻译所有中文文本
         print("⚡ 开始高速并发翻译...")
@@ -677,11 +622,11 @@ class LargeHtmlProcessor:
         )
 
         # 5. 创建翻译映射表
-        print("📋 创建翻译映射表...")
+        print("创建翻译映射表...")
         translation_map = dom_service.create_translation_map(translation_results)
 
         # 6. 对每个块使用DOM服务进行100%替换
-        print("🔄 使用DOM服务进行100%替换...")
+        print(" 使用DOM服务进行100%替换...")
         translated_chunks = []
 
         for i, (chunk, dom_data) in enumerate(zip(chunks, all_dom_data)):
@@ -727,10 +672,10 @@ class LargeHtmlProcessor:
             "remaining_texts": list(set(remaining_chinese))[:10]
         }
 
-        print(f"🎉 大型HTML终极DOM处理完成! 耗时: {processing_time}秒")
-        print(f"🎯 终极替换率: {stats['replacement_rate']:.2f}%")
-        print(f"⚡ 翻译耗时: {stats['translation_duration']}秒")
-        print(f"🚀 翻译速度: {stats['unique_texts']/stats['translation_duration']:.1f} 文本/秒")
+        print(f" 大型HTML终极DOM处理完成! 耗时: {processing_time}秒")
+        print(f" 终极替换率: {stats['replacement_rate']:.2f}%")
+        print(f" 翻译耗时: {stats['translation_duration']}秒")
+        print(f" 翻译速度: {stats['unique_texts']/stats['translation_duration']:.1f} 文本/秒")
 
         return final_html, stats
 
