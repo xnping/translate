@@ -10,6 +10,8 @@ aiohttp
 # 其他依赖
 python-dotenv
 PyYAML
+beautifulsoup4
+lxml
 
 # Redis缓存 (可选)
 redis

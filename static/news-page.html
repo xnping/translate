@@ -253,6 +253,8 @@
             border: 1px solid #91d5ff;
         }
 
+
+
     </style>
 </head>
 <body>
@@ -416,7 +418,7 @@
                 <input type="text" class="form-input" id="noTranslateTags" placeholder="可选">
             </div>
 
-            <button type="submit" class="btn-translate">开始翻译</button>
+            <button type="submit" class="btn-translate">🚀 开始翻译</button>
         </form>
 
         <div id="statusMessage" class="status-message"></div>
@@ -469,12 +471,42 @@
 
                 console.log('后端返回的结果：', result);
 
+                // 如果翻译成功，替换页面内容
+                if (result.success && result.data.ultimate_replacement_results) {
+                    const translatedHtml = result.data.ultimate_replacement_results.translated_html_body;
+                    const stats = result.data.ultimate_replacement_results.replacement_statistics;
+
+                    // 询问用户是否要应用翻译
+                    const applyTranslation = confirm(
+                        `🎉 终极翻译完成！\n` +
+                        `替换率: ${stats.replacement_rate.toFixed(2)}%\n` +
+                        `已替换 ${stats.replaced_count} 个中文字符\n` +
+                        `剩余 ${stats.remaining_chinese_count} 个中文字符\n\n` +
+                        `是否要应用翻译到当前页面？`
+                    );
+
+                    if (applyTranslation) {
+                        // 替换页面body内容
+                        document.body.innerHTML = translatedHtml;
+
+                        // 更新状态消息
+                        const newStatusDiv = document.getElementById('statusMessage');
+                        if (newStatusDiv) {
+                            newStatusDiv.textContent = `🎉 翻译已应用！替换率: ${stats.replacement_rate.toFixed(2)}%`;
+                        }
+
+                        console.log('🎉 翻译已应用！', stats);
+                    }
+                }
+
             } catch (error) {
                 console.error('翻译请求失败：', error);
                 statusDiv.className = 'status-message status-error';
                 statusDiv.textContent = '请求失败：' + error.message;
             }
         });
+
+
     </script>
 
 </body>

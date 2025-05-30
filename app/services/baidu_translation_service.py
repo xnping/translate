@@ -137,8 +137,8 @@ class BaiduTranslationService:
                 results["failed_count"] += 1
                 print(f"    ❌ 失败: {translation_result['error']}")
             
-            # 添加延迟避免API限制
-            time.sleep(0.1)
+            # 添加延迟避免API限制（减少延迟提高速度）
+            time.sleep(0.05)  # 从0.1秒减少到0.05秒
         
         print(f"✅ 批量翻译完成! 成功: {results['success_count']}, 失败: {results['failed_count']}")
         return results
