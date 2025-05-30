@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title class="page-title">广西新闻网 - 最新资讯</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .news-header {
+            border-bottom: 3px solid #1890ff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .news-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .news-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-content {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .content-paragraph {
+            margin-bottom: 20px;
+            text-indent: 2em;
+        }
+
+        .highlight-text {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .important-text {
+            font-weight: bold;
+            color: #d73527;
+        }
+
+        .quote-text {
+            font-style: italic;
+            color: #555;
+            border-left: 4px solid #1890ff;
+            padding-left: 15px;
+            margin: 20px 0;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1890ff;
+            border-bottom: 2px solid #1890ff;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .news-list {
+            list-style: none;
+        }
+
+        .news-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .news-link {
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .news-link:hover {
+            color: #1890ff;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background-color: #f0f0f0;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        /* 翻译表单样式 */
+        .translate-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .translate-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1890ff;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .btn-translate {
+            width: 100%;
+            background-color: #52c41a;
+            color: white;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .btn-translate:hover {
+            background-color: #389e0d;
+        }
+
+        .status-message {
+            margin-top: 10px;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            display: none;
+        }
+
+        .status-success {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .status-error {
+            background-color: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .status-loading {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <main class="main-content news-main">
+            <header class="news-header article-header">
+                <h1 class="news-title main-title">广西多部门联动开展"牵手'童'行"公益行动</h1>
+                <div class="news-meta article-meta">
+                    <span class="meta-item source-info">
+                        <strong class="label-text">来源：</strong>
+                        <span class="source-name">广西日报</span>
+                    </span>
+                    <span class="meta-item date-info">
+                        <strong class="label-text">时间：</strong>
+                        <time class="publish-date" datetime="2025-05-29">2025.05.29 07:50</time>
+                    </span>
+                    <div class="action-buttons article-actions">
+                        <button class="btn btn-primary share-btn" type="button">送至楼层</button>
+                        <button class="btn btn-secondary size-btn" type="button">大</button>
+                        <button class="btn btn-secondary size-btn" type="button">小</button>
+                        <button class="btn btn-secondary print-btn" type="button">打印</button>
+                    </div>
+                </div>
+            </header>
+
+            <article class="news-content main-article">
+                <p class="content-paragraph intro-paragraph">
+                    在<strong class="important-text">"六一"国际儿童节</strong>即将到来之际，由自治区民政厅、自治区高级法院联合自治区
+                    <em class="emphasis-text">妇联、自治区教育厅等部门</em>共同举办的
+                    <span class="highlight-text">"微心愿收集牵手'童'行——2025年'泡心'伴成长同心护未来"</span>
+                    关爱儿童主题宣传活动，日前在南宁举行。
+                </p>
+
+                <p class="content-paragraph detail-paragraph">
+                    活动通过<cite class="quote-reference">"微心愿"</cite>认领、儿童文艺展演、守护故事分享等环节，
+                    展现<mark class="highlight-mark">广西关爱农村留守儿童、困境儿童的创新实践与暖心成果</mark>，
+                    凝聚社会各界护童成长的合力。
+                </p>
+
+                <blockquote class="quote-text important-quote">
+                    <p class="quote-content">
+                        活动现场，<span class="speaker-name">"微心愿"</span>认领环节成为一大亮点。
+                        <q class="inline-quote">"想要一个新书包"</q>、<q class="inline-quote">"希望有一本《百科全书》"</q>、
+                        <q class="inline-quote">"梦想拥有一个篮球"</q>……
+                    </p>
+                </blockquote>
+
+                <p class="content-paragraph description-paragraph">
+                    这些质朴而真挚的心愿，承载着<abbr title="农村留守儿童" class="abbreviation">留守儿童</abbr>和
+                    <abbr title="困境儿童" class="abbreviation">困境儿童</abbr>最真挚的期盼。
+                    这些心愿均由基层儿童工作者深入走访征集而来，所需物资涵盖
+                    <span class="category-list">学习用品、体育器材、生活用品</span>等，
+                    每个心愿价值不超过<data value="300" class="price-data">300元</data>。
+                </p>
+
+                <section class="content-section activity-section">
+                    <h2 class="section-title sub-heading">活动亮点</h2>
+                    <p class="content-paragraph highlight-paragraph">
+                        在儿童文艺展演环节，孩子们用纯真无邪的表演展现出积极向上的精神风貌，
+                        赢得了<del class="correction-text">阵阵</del><ins class="insert-text">热烈</ins>掌声。
+                        故事分享环节中，<small class="small-text">来自各行各业的人员分享了</small>
+                        守护儿童的动人故事，见证了孤寡家庭<sup class="superscript">[1]</sup>
+                        "牵手'童'行"的温馨场景，也看到了爱心企业和行动者的责任担当<sub class="subscript">注释</sub>。
+                    </p>
+                </section>
+
+                <aside class="content-aside related-info">
+                    <h3 class="aside-title related-title">相关信息</h3>
+                    <dl class="definition-list info-list">
+                        <dt class="term-title">活动主办方：</dt>
+                        <dd class="term-description">自治区民政厅、自治区高级法院</dd>
+                        <dt class="term-title">协办单位：</dt>
+                        <dd class="term-description">自治区妇联、自治区教育厅</dd>
+                        <dt class="term-title">活动时间：</dt>
+                        <dd class="term-description">2025年5月29日</dd>
+                    </dl>
+                </aside>
+
+                <footer class="article-footer content-footer">
+                    <div class="tag-list article-tags">
+                        <span class="tag news-tag">公益活动</span>
+                        <span class="tag category-tag">儿童关爱</span>
+                        <span class="tag location-tag">广西</span>
+                        <span class="tag event-tag">六一儿童节</span>
+                        <span class="tag type-tag">社会新闻</span>
+                    </div>
+                </footer>
+            </article>
+
+        <aside class="sidebar news-sidebar">
+            <section class="sidebar-section hot-news">
+                <h2 class="sidebar-title section-header">广西要闻</h2>
+                <ul class="news-list hot-list">
+                    <li class="news-item list-item">
+                        <a href="#" class="news-link item-link">陈刚到南宁市调研，强调要深化产教融合发展...</a>
+                    </li>
+                    <li class="news-item list-item">
+                        <a href="#" class="news-link item-link">"桂字号"农业品牌总价值超过<span class="number-value">5000亿元</span></a>
+                    </li>
+                    <li class="news-item list-item">
+                        <a href="#" class="news-link item-link">广西面向东盟的立体综合通道建设加快成形</a>
+                    </li>
+                    <li class="news-item list-item">
+                        <a href="#" class="news-link item-link">广西多部门联动开展"牵手'童'行"公益行动</a>
+                    </li>
+                    <li class="news-item list-item">
+                        <a href="#" class="news-link item-link">广西<time class="year-time">2025年</time>高考招生方案出炉</a>
+                    </li>
+                    <li class="news-item list-item">
+                        <a href="#" class="news-link item-link"><time class="date-time">5月29日</time>广西还有大范围强降雨</a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="sidebar-section image-news">
+                <h2 class="sidebar-title section-header">图片新闻</h2>
+                <div class="image-placeholder news-image">
+                    <p class="placeholder-text image-text">智能问答</p>
+                    <p class="description-text image-desc">工业生产场景图片展示</p>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <!-- 翻译功能面板 -->
+    <div class="translate-panel">
+        <h3 class="translate-title">页面翻译</h3>
+        <form id="translateForm">
+            <div class="form-group">
+                <label class="form-label" for="pathInput">路径：</label>
+                <input type="text" class="form-input" id="pathInput" value="">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="sourceLanguage">源语言：</label>
+                <select class="form-select" id="sourceLanguage">
+                    <option value="zh">中文</option>
+                    <option value="en">英语</option>
+                    <option value="ja">日语</option>
+                    <option value="ko">韩语</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="targetLanguage">目标语言：</label>
+                <select class="form-select" id="targetLanguage">
+                    <option value="en">英语</option>
+                    <option value="zh">中文</option>
+                    <option value="ja">日语</option>
+                    <option value="ko">韩语</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="untranslatableTags">翻译不到的标签：</label>
+                <input type="text" class="form-input" id="untranslatableTags" placeholder="可选">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="noTranslateTags">不需要翻译的标签：</label>
+                <input type="text" class="form-input" id="noTranslateTags" placeholder="可选">
+            </div>
+
+            <button type="submit" class="btn-translate">开始翻译</button>
+        </form>
+
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+
+    <script>
+        // 页面加载时设置当前URL
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('pathInput').value = window.location.href;
+        });
+
+        // 翻译功能
+        document.getElementById('translateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                path: document.getElementById('pathInput').value,
+                html_body: document.body.outerHTML,
+                source_language: document.getElementById('sourceLanguage').value,
+                target_language: document.getElementById('targetLanguage').value,
+                untranslatable_tags: document.getElementById('untranslatableTags').value || null,
+                no_translate_tags: document.getElementById('noTranslateTags').value || null
+            };
+
+            console.log('发送到后端的数据：', formData);
+
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status-message status-loading';
+            statusDiv.textContent = '正在处理...';
+
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}...`);
+                }
+
+                const result = await response.json();
+
+                statusDiv.className = 'status-message status-success';
+                statusDiv.textContent = result.message;
+
+                console.log('后端返回的结果：', result);
+
+            } catch (error) {
+                console.error('翻译请求失败：', error);
+                statusDiv.className = 'status-message status-error';
+                statusDiv.textContent = '请求失败：' + error.message;
+            }
+        });
+    </script>
+
+</body>
+</html>
