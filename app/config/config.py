@@ -48,6 +48,11 @@ class Settings(BaseSettings):
     memory_cache_size: int = 1000
     memory_cache_ttl: int = 300
 
+    # ===== 文件缓存配置 =====
+    file_cache_ttl_days: int = 7
+    file_cache_max_size_mb: int = 1024
+    file_cache_cleanup_interval_hours: int = 24
+
     # ===== 百度翻译API配置 =====
     baidu_app_id: str = ""
     baidu_secret_key: str = ""

@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 
 from app.config.config import init_database, close_database, get_settings
 from app.api.translation import router as translation_router
-from app.services.redis_cache_service import redis_cache_service
+from app.services.redis_path_cache_service import redis_path_cache_service
 
 
 @asynccontextmanager
@@ -28,21 +28,22 @@ async def lifespan(app: FastAPI):
         print(f" MySQL数据库连接失败: {e}")
         print(" 将继续启动服务，但数据库功能可能不可用")
 
-    # 初始化Redis连接测试
+    # 初始化Redis路径缓存服务
     try:
-        redis_success = await redis_cache_service.initialize()
+        redis_success = await redis_path_cache_service.initialize()
         if redis_success:
-            print(" Redis连接测试成功")
+            print("✅ Redis路径缓存服务初始化成功")
             # 获取Redis连接信息
-            redis_info = await redis_cache_service.get_cache_info()
-            print(f"   Redis主机: {redis_cache_service.host}:{redis_cache_service.port}")
+            redis_info = await redis_path_cache_service.get_cache_info()
+            print(f"   Redis主机: {redis_path_cache_service.host}:{redis_path_cache_service.port}")
             print(f"   Redis版本: {redis_info.get('redis_version', 'unknown')}")
             print(f"   连接客户端: {redis_info.get('connected_clients', 0)}")
             print(f"   内存使用: {redis_info.get('used_memory_human', 'unknown')}")
+            print(f"   路径缓存键数量: {redis_info.get('path_cache_keys', 0)}")
         else:
-            print("Redis连接测试失败")
+            print("❌ Redis路径缓存服务初始化失败")
     except Exception as e:
-        print(f" Redis初始化异常: {e}")
+        print(f"❌ Redis路径缓存初始化异常: {e}")
 
     print("服务启动完成！")
 
@@ -58,10 +59,10 @@ async def lifespan(app: FastAPI):
         print(f"MySQL数据库关闭失败: {e}")
 
     try:
-        await redis_cache_service.close()
-        print("Redis连接已关闭")
+        await redis_path_cache_service.close()
+        print("✅ Redis路径缓存连接已关闭")
     except Exception as e:
-        print(f"Redis连接关闭失败: {e}")
+        print(f"⚠️ Redis路径缓存连接关闭失败: {e}")
 
     print("服务已关闭")
 
@@ -109,16 +110,16 @@ async def root():
 
 @app.get("/redis/status")
 async def redis_status():
-    """Redis缓存状态"""
-    cache_info = await redis_cache_service.get_cache_info()
+    """Redis路径缓存状态"""
+    cache_info = await redis_path_cache_service.get_cache_info()
     return {
-        "redis_cache": cache_info,
+        "redis_path_cache": cache_info,
         "config": {
-            "host": redis_cache_service.host,
-            "port": redis_cache_service.port,
-            "db": redis_cache_service.db,
-            "cache_ttl": redis_cache_service.cache_ttl,
-            "use_compression": redis_cache_service.use_compression
+            "host": redis_path_cache_service.host,
+            "port": redis_path_cache_service.port,
+            "db": redis_path_cache_service.db,
+            "cache_ttl": redis_path_cache_service.cache_ttl,
+            "use_compression": redis_path_cache_service.use_compression
         }
     }
 

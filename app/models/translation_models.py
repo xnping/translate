@@ -14,6 +14,7 @@ class TranslationRequest(BaseModel):
     target_language: str = Field(..., description="目标语言")
     untranslatable_tags: Optional[str] = Field(None, description="翻译不到的标签")
     no_translate_tags: Optional[str] = Field(None, description="不需要翻译的标签")
+    cache: bool = Field(True, description="缓存策略：true=文件缓存，false=Redis缓存")
 
 
 class TranslationResponse(BaseModel):

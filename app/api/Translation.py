@@ -7,6 +7,8 @@ from app.models.translation_models import TranslationRequest, TranslationRespons
 from app.services.baidu_translation_service import baidu_translation_service
 from app.services.dom_replacement_service import dom_replacement_service
 from app.services.large_html_processor import large_html_processor
+from app.services.file_cache_service import file_cache_service
+from app.services.redis_path_cache_service import redis_path_cache_service
 
 router = APIRouter(prefix="/api", tags=["翻译"])
 
@@ -34,8 +36,37 @@ async def translate_ultimate(request: TranslationRequest):
     print(f"📝 HTML Body 长度: {len(request.html_body)} 字符")
     print(f"🌐 源语言: {request.source_language}")
     print(f"🎯 目标语言: {request.target_language}")
+    print(f"💾 缓存策略: {'文件缓存' if request.cache else 'Redis缓存'}")
 
-    # 3. 检测是否为大型HTML（超过10万字符）
+    # 3. 根据cache参数检查缓存
+    cached_result = None
+    if request.cache:
+        # 使用文件缓存 - 基于路径哈希
+        print("📁 检查文件缓存 (基于路径MD5哈希)...")
+        cached_result = await file_cache_service.get_cache(
+            request.path,
+            request.source_language,
+            request.target_language
+        )
+    else:
+        # 使用Redis缓存 - 基于路径哈希
+        print("🔄 检查Redis缓存 (基于路径MD5哈希)...")
+        cached_result = await redis_path_cache_service.get_cache(
+            request.path,
+            request.source_language,
+            request.target_language
+        )
+
+    # 如果找到缓存，直接返回
+    if cached_result:
+        print("🎉 使用缓存结果，跳过翻译！")
+        return TranslationResponse(
+            success=True,
+            message=f"🎉 使用{'文件' if request.cache else 'Redis'}缓存结果！",
+            data=cached_result
+        )
+
+    # 4. 检测是否为大型HTML（超过10万字符）
     html_length = len(request.html_body)
     is_large_html = html_length > 100000
 
@@ -69,24 +100,46 @@ async def translate_ultimate(request: TranslationRequest):
             print(f"  剩余文本: {large_stats['remaining_texts'][:3]}")
         print("=" * 80)
 
+        # 保存翻译结果到缓存
+        translation_data = {
+            "request_info": {
+                "path": request.path,
+                "html_length": len(request.html_body),
+                "source_language": request.source_language,
+                "target_language": request.target_language,
+                "processing_mode": "large_html",
+                "untranslatable_tags": request.untranslatable_tags,
+                "no_translate_tags": request.no_translate_tags,
+                "cache_strategy": "file_cache" if request.cache else "redis_cache"
+            },
+            "large_html_results": {
+                "translated_html_body": translated_html_body,
+                "processing_statistics": large_stats
+            }
+        }
+
+        # 根据cache参数保存到对应缓存
+        if request.cache:
+            print("💾 保存到文件缓存 (基于路径MD5哈希)...")
+            await file_cache_service.set_cache(
+                request.path,
+                request.source_language,
+                request.target_language,
+                translation_data
+            )
+        else:
+            print("💾 保存到Redis缓存 (基于路径MD5哈希)...")
+            await redis_path_cache_service.set_cache(
+                request.path,
+                request.source_language,
+                request.target_language,
+                translation_data
+            )
+
         return TranslationResponse(
             success=True,
             message=f"🎉 大型HTML翻译完成！耗时: {large_stats['processing_time']}秒，替换率: {large_stats['replacement_rate']:.2f}%",
-            data={
-                "request_info": {
-                    "path": request.path,
-                    "html_length": len(request.html_body),
-                    "source_language": request.source_language,
-                    "target_language": request.target_language,
-                    "processing_mode": "large_html",
-                    "untranslatable_tags": request.untranslatable_tags,
-                    "no_translate_tags": request.no_translate_tags
-                },
-                "large_html_results": {
-                    "translated_html_body": translated_html_body,
-                    "processing_statistics": large_stats
-                }
-            }
+            data=translation_data
         )
 
     else:
@@ -150,26 +203,48 @@ async def translate_ultimate(request: TranslationRequest):
 
         print("=" * 80)
 
+        # 保存翻译结果到缓存
+        translation_data = {
+            "request_info": {
+                "path": request.path,
+                "html_length": len(request.html_body),
+                "source_language": request.source_language,
+                "target_language": request.target_language,
+                "processing_mode": "standard",
+                "untranslatable_tags": request.untranslatable_tags,
+                "no_translate_tags": request.no_translate_tags,
+                "cache_strategy": "file_cache" if request.cache else "redis_cache"
+            },
+            "dom_extraction_results": dom_data['statistics'],
+            "translation_results": translation_results,
+            "ultimate_replacement_results": {
+                "original_html_body": request.html_body,
+                "translated_html_body": translated_html_body,
+                "replacement_statistics": ultimate_stats,
+                "translation_map": translation_map
+            }
+        }
+
+        # 根据cache参数保存到对应缓存
+        if request.cache:
+            print("💾 保存到文件缓存 (基于路径MD5哈希)...")
+            await file_cache_service.set_cache(
+                request.path,
+                request.source_language,
+                request.target_language,
+                translation_data
+            )
+        else:
+            print("💾 保存到Redis缓存 (基于路径MD5哈希)...")
+            await redis_path_cache_service.set_cache(
+                request.path,
+                request.source_language,
+                request.target_language,
+                translation_data
+            )
+
         return TranslationResponse(
             success=True,
             message=f"🎉 终极翻译完成！替换率: {ultimate_stats['replacement_rate']:.2f}%",
-            data={
-                "request_info": {
-                    "path": request.path,
-                    "html_length": len(request.html_body),
-                    "source_language": request.source_language,
-                    "target_language": request.target_language,
-                    "processing_mode": "standard",
-                    "untranslatable_tags": request.untranslatable_tags,
-                    "no_translate_tags": request.no_translate_tags
-                },
-                "dom_extraction_results": dom_data['statistics'],
-                "translation_results": translation_results,
-                "ultimate_replacement_results": {
-                    "original_html_body": request.html_body,
-                    "translated_html_body": translated_html_body,
-                    "replacement_statistics": ultimate_stats,
-                    "translation_map": translation_map
-                }
-            }
+            data=translation_data
         )
